@@ -1,67 +1,104 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StatusBanner } from "@/components/StatusBanner";
 import { SolarPowerCard } from "@/components/SolarPowerCard";
 import { WeatherCard } from "@/components/WeatherCard";
+import { WeatherAnalysisCard } from "@/components/WeatherAnalysisCard";
 import { RackControlCard } from "@/components/RackControlCard";
+import { BlynkConnectionStatus } from "@/components/BlynkConnectionStatus";
+import { BlynkSettingsDialog } from "@/components/BlynkSettingsDialog";
+import { blynkService, type DeviceData } from "@/services/blynkService";
 import { toast } from "sonner";
 
 const Index = () => {
-  const [solarData] = useState({
-    batteryLevel: 85,
-    isCharging: true,
-    currentOutput: 102.79829981950481,
-  });
+  const [deviceData, setDeviceData] = useState<DeviceData | null>(null);
 
-  const [weatherData] = useState({
-    temperature: 26,
-    humidity: 58,
-    uvIndex: 7,
-    windSpeed: 10,
-  });
-
-  const handleExtend = () => {
-    toast.success("Rack extended");
-  };
-
-  const handleRetract = () => {
-    toast.success("Rack retracted");
-  };
+  useEffect(() => {
+    // Initialize Blynk service with a mock API key
+    // In a real application, this would come from environment variables or user input
+    const initService = async () => {
+      const success = await blynkService.initialize("BLYNK_API_KEY_12345");
+      if (success) {
+        // Subscribe to device data updates
+        const unsubscribe = blynkService.subscribe(setDeviceData);
+        
+        return () => {
+          unsubscribe();
+        };
+      }
+    };
+    
+    initService();
+    
+    // Clean up on unmount
+    return () => {
+      blynkService.disconnect();
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-6 lg:p-8">
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Header */}
-        <header className="space-y-2">
-          <h1 className="text-3xl md:text-4xl font-bold text-primary">Smart Drying Rack</h1>
-          <p className="text-muted-foreground">
-            Solar-powered IoT drying solution with weather monitoring
-          </p>
+        <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="space-y-2">
+            <h1 className="text-3xl md:text-4xl font-bold text-primary">Smart Drying Rack</h1>
+            <p className="text-muted-foreground">
+              Solar-powered IoT drying solution with weather monitoring
+            </p>
+          </div>
+          <div>
+            <BlynkSettingsDialog />
+          </div>
         </header>
 
-        {/* Status Banner */}
-        <StatusBanner
-          title="Moderate Conditions"
-          message="Weather is acceptable but not optimal. Monitor for changes."
-          variant="warning"
-        />
+        {/* Blynk Connection Status */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <StatusBanner
+              title={deviceData?.connected ? "Connected to Blynk" : "Disconnected"}
+              message={deviceData?.connected 
+                ? "Live data streaming from IoT device" 
+                : "No connection to IoT device"}
+              variant={deviceData?.connected ? "success" : "warning"}
+            />
+          </div>
+          <div>
+            <BlynkConnectionStatus 
+              connected={!!deviceData?.connected} 
+              lastUpdate={deviceData?.lastUpdate || null} 
+            />
+          </div>
+        </div>
 
         {/* Solar Power & Weather Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <SolarPowerCard
-            batteryLevel={solarData.batteryLevel}
-            isCharging={solarData.isCharging}
-            currentOutput={solarData.currentOutput}
+            batteryLevel={deviceData?.batteryLevel || 0}
+            isCharging={!!deviceData?.isCharging}
+            currentOutput={deviceData?.currentOutput || 0}
           />
           <WeatherCard
-            temperature={weatherData.temperature}
-            humidity={weatherData.humidity}
-            uvIndex={weatherData.uvIndex}
-            windSpeed={weatherData.windSpeed}
+            temperature={deviceData?.temperature || 0}
+            humidity={deviceData?.humidity || 0}
+            uvIndex={deviceData?.uvIndex || 0}
+            windSpeed={deviceData?.windSpeed || 0}
+          />
+          <WeatherAnalysisCard
+            temperature={deviceData?.temperature || 0}
+            humidity={deviceData?.humidity || 0}
+            uvIndex={deviceData?.uvIndex || 0}
+            windSpeed={deviceData?.windSpeed || 0}
           />
         </div>
 
         {/* Rack Control */}
-        <RackControlCard onExtend={handleExtend} onRetract={handleRetract} />
+        <RackControlCard 
+          onExtend={() => blynkService.controlRack('extend')} 
+          onRetract={() => blynkService.controlRack('retract')} 
+          position={deviceData?.rackPosition || 'extended'}
+          autoMode={deviceData?.autoMode || false}
+          onToggleAutoMode={(enabled) => blynkService.toggleAutoMode(enabled)}
+        />
       </div>
     </div>
   );

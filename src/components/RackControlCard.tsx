@@ -7,20 +7,38 @@ import { Button } from "@/components/ui/button";
 interface RackControlCardProps {
   onExtend: () => void;
   onRetract: () => void;
+  position?: 'extended' | 'retracted';
+  autoMode?: boolean;
+  onToggleAutoMode?: (enabled: boolean) => void;
 }
 
-export const RackControlCard = ({ onExtend, onRetract }: RackControlCardProps) => {
-  const [autoMode, setAutoMode] = useState(true);
-  const [position, setPosition] = useState<"extended" | "retracted">("extended");
+export const RackControlCard = ({ onExtend, onRetract, position: propPosition, autoMode: propAutoMode, onToggleAutoMode }: RackControlCardProps) => {
+  const [localAutoMode, setLocalAutoMode] = useState(true);
+  const [localPosition, setLocalPosition] = useState<"extended" | "retracted">("extended");
 
-  const handleExtend = () => {
-    setPosition("extended");
-    onExtend();
+  // Use props if provided, otherwise fall back to local state
+  const effectivePosition = propPosition ?? localPosition;
+  const effectiveAutoMode = propAutoMode ?? localAutoMode;
+
+  const handleExtend = async () => {
+    if (onExtend) {
+      await onExtend();
+    }
+    setLocalPosition("extended");
   };
 
-  const handleRetract = () => {
-    setPosition("retracted");
-    onRetract();
+  const handleRetract = async () => {
+    if (onRetract) {
+      await onRetract();
+    }
+    setLocalPosition("retracted");
+  };
+
+  const handleToggleAutoMode = (enabled: boolean) => {
+    if (onToggleAutoMode) {
+      onToggleAutoMode(enabled);
+    }
+    setLocalAutoMode(enabled);
   };
 
   return (
@@ -33,20 +51,20 @@ export const RackControlCard = ({ onExtend, onRetract }: RackControlCardProps) =
       <div className="space-y-6">
         <div className="flex items-center justify-between p-4 bg-secondary rounded-lg">
           <span className="font-medium text-card-foreground">Auto Mode</span>
-          <Switch checked={autoMode} onCheckedChange={setAutoMode} />
+          <Switch checked={effectiveAutoMode} onCheckedChange={handleToggleAutoMode} />
         </div>
 
         <div>
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm text-muted-foreground">Current Position</span>
-            <span className="font-semibold text-card-foreground capitalize">{position}</span>
+            <span className="font-semibold text-card-foreground capitalize">{effectivePosition}</span>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <Button
               onClick={handleExtend}
-              disabled={position === "extended"}
-              variant={position === "extended" ? "default" : "outline"}
+              disabled={effectivePosition === "extended"}
+              variant={effectivePosition === "extended" ? "default" : "outline"}
               className="w-full"
             >
               <ChevronUp className="h-4 w-4 mr-2" />
@@ -54,8 +72,8 @@ export const RackControlCard = ({ onExtend, onRetract }: RackControlCardProps) =
             </Button>
             <Button
               onClick={handleRetract}
-              disabled={position === "retracted"}
-              variant={position === "retracted" ? "default" : "outline"}
+              disabled={effectivePosition === "retracted"}
+              variant={effectivePosition === "retracted" ? "default" : "outline"}
               className="w-full"
             >
               <ChevronDown className="h-4 w-4 mr-2" />
@@ -64,7 +82,7 @@ export const RackControlCard = ({ onExtend, onRetract }: RackControlCardProps) =
           </div>
         </div>
 
-        {autoMode && (
+        {effectiveAutoMode && (
           <div className="flex items-start gap-2 p-3 bg-success/10 border border-success/30 rounded-lg">
             <Check className="h-4 w-4 text-success mt-0.5 flex-shrink-0" />
             <p className="text-sm text-success">
