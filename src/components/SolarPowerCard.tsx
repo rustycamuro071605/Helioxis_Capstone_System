@@ -15,6 +15,9 @@ export const SolarPowerCard = ({ batteryLevel, isCharging, currentOutput }: Sola
         <Sun className="h-5 w-5 text-primary" />
         <h2 className="text-xl font-bold text-card-foreground">Solar Power</h2>
       </div>
+      <p className="text-sm text-muted-foreground mb-4">
+        Powered by 12V/10W solar panel with charge controller and 12V battery pack
+      </p>
 
       <div className="space-y-4">
         <div>

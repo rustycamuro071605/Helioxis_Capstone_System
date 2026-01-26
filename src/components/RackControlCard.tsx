@@ -54,6 +54,10 @@ export const RackControlCard = ({ onExtend, onRetract, position: propPosition, a
           <Switch checked={effectiveAutoMode} onCheckedChange={handleToggleAutoMode} />
         </div>
 
+        <p className="text-sm text-muted-foreground">
+          Controlled by ESP32 microcontroller via L298N motor driver and DC gear motor
+        </p>
+
         <div>
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm text-muted-foreground">Current Position</span>

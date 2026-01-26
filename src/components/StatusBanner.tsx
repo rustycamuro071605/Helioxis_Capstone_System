@@ -20,6 +20,11 @@ export const StatusBanner = ({ title, message, variant = "warning" }: StatusBann
         <div>
           <h3 className="font-semibold mb-1">{title}</h3>
           <p className="text-sm opacity-90">{message}</p>
+          {variant === "success" && (
+            <p className="text-xs opacity-75 mt-1">
+              Powered by ESP32 microcontroller with Wi-Fi connectivity
+            </p>
+          )}
         </div>
       </div>
     </div>

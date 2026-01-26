@@ -84,6 +84,9 @@ export const WeatherAnalysisCard = ({
         <Eye className="h-5 w-5 text-info" />
         <h2 className="text-xl font-bold text-card-foreground">Weather Analysis</h2>
       </div>
+      <p className="text-sm text-muted-foreground mb-4">
+        Real-time analysis using ESP32 with DHT22 and rain sensor (YL-83) integration
+      </p>
 
       <div className="space-y-4">
         <div className="p-4 rounded-lg bg-secondary">

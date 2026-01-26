@@ -15,6 +15,9 @@ export const WeatherCard = ({ temperature, humidity, uvIndex, windSpeed }: Weath
         <Cloud className="h-5 w-5 text-info" />
         <h2 className="text-xl font-bold text-card-foreground">Weather Conditions</h2>
       </div>
+      <p className="text-sm text-muted-foreground mb-4">
+        Data collected via DHT22 sensor and processed by ESP32 microcontroller
+      </p>
 
       <div className="grid grid-cols-2 gap-4">
         <div>

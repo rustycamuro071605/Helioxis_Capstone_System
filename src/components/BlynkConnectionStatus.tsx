@@ -23,8 +23,13 @@ export const BlynkConnectionStatus = ({ connected, lastUpdate }: BlynkConnection
           <div>
             <h3 className="font-semibold text-card-foreground">Blynk Connection</h3>
             <p className="text-sm text-muted-foreground">
-              {connected ? 'Connected to IoT device' : 'Disconnected from IoT device'}
+              {connected ? 'Connected to ESP32 IoT device' : 'Disconnected from ESP32 IoT device'}
             </p>
+            {connected && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Data from DHT22, YL-83 sensors and L298N motor controller
+              </p>
+            )}
           </div>
         </div>
         
