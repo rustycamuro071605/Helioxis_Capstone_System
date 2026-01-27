@@ -10,8 +10,8 @@ interface StatusBannerProps {
 
 export const StatusBanner = ({ title, message, variant = "warning", isCharging = false }: StatusBannerProps) => {
   return (
-    <Card className="p-6 bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-xl border border-slate-700/50">
-      <h2 className="text-2xl font-semibold text-white mb-5">System Status</h2>
+    <Card className="p-6 bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-2xl border border-slate-700/50 hover:border-green-500/30 transition-all duration-300 hover:shadow-green-500/20 hover:scale-[1.02]">
+      <h2 className="text-2xl font-semibold text-white mb-5 bg-gradient-to-r from-green-400 to-emerald-400 bg-clip-text text-transparent">System Status</h2>
       
       <div className="space-y-3">
         <div className="flex items-center gap-3 p-3 bg-green-900/30 rounded-xl border border-green-800/50">

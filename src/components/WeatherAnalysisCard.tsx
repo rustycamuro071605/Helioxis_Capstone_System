@@ -83,8 +83,8 @@ export const WeatherAnalysisCard = ({
   const recommendations = getRecommendations();
 
   return (
-    <Card className="p-6 bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-xl border border-slate-700/50">
-      <h2 className="text-2xl font-semibold text-white mb-6">Weather Analysis & Recommendation</h2>
+    <Card className="p-6 bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-2xl border border-slate-700/50 hover:border-blue-500/30 transition-all duration-300 hover:shadow-blue-500/20 hover:scale-[1.02]">
+      <h2 className="text-2xl font-semibold text-white mb-6 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">Weather Analysis & Recommendation</h2>
 
       <div className="space-y-5">
         {/* Main Status Alert */}
