@@ -17,7 +17,7 @@ export const StatusBanner = ({ title, message, variant = "warning", isCharging =
         <div className="flex items-center gap-3 p-3 bg-green-900/30 rounded-xl border border-green-800/50">
           <CheckCircle className="h-5 w-5 text-green-400 flex-shrink-0" />
           <div>
-            <span className="text-sm font-medium text-gray-200">Connected to Blynk (ESP82)</span>
+            <span className="text-sm font-medium text-gray-200">Connected to Blynk (ESP32)</span>
           </div>
         </div>
         
