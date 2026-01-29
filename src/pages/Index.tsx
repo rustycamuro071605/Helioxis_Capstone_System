@@ -33,22 +33,23 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 md:p-6 lg:p-8">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 md:p-6 lg:p-8 relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(251,146,60,0.1)_0%,transparent_50%),radial-gradient(circle_at_70%_80%,rgba(59,130,246,0.1)_0%,transparent_50%)]"></div>
+      <div className="max-w-7xl mx-auto space-y-6 relative z-10">
 
         {/* HEADER */}
         <header className="flex items-center justify-between gap-6 mb-8">
           <div className="flex items-center gap-6">
-            <div className="relative scale-75">
+            <div className="relative scale-75 animate-pulse-slow">
               <img
                 src="/logo.png"
                 alt="Smart Drying Rack Logo"
                 className="h-48 w-auto drop-shadow-2xl brightness-125 contrast-125 saturate-150"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-orange-500/40 via-transparent to-blue-500/40 rounded-full blur-lg"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-500/40 via-transparent to-blue-500/40 rounded-full blur-lg animate-pulse"></div>
               <div className="absolute inset-0 bg-gradient-to-r from-orange-400/30 to-blue-400/30 rounded-full opacity-80"></div>
             </div>
-            <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-blue-500 pb-4">
+            <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-300 to-blue-500 pb-4 animate-fade-in">
               Smart Drying Rack
             </h1>
           </div>

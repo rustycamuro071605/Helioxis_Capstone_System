@@ -14,8 +14,8 @@ export const SolarPowerCard = ({ batteryLevel, isCharging, currentOutput }: Sola
   const strokeDashoffset = circumference - (batteryLevel / 100) * circumference;
 
   return (
-    <Card className="p-6 bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-xl border border-slate-700/50">
-      <h2 className="text-2xl font-semibold text-white mb-5">Solar Power</h2>
+    <Card className="p-6 bg-slate-800/50 backdrop-blur-sm rounded-3xl shadow-2xl border border-slate-700/50 hover:border-orange-500/30 transition-all duration-300 hover:shadow-orange-500/20 hover:scale-[1.02]">
+      <h2 className="text-2xl font-semibold text-white mb-5 bg-gradient-to-r from-orange-400 to-amber-400 bg-clip-text text-transparent">Solar Power</h2>
 
       <div className="space-y-5">
         {/* Circular Progress and Output - Side by side */}
