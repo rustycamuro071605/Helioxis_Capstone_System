@@ -8,6 +8,7 @@ import { BlynkConnectionStatus } from "@/components/BlynkConnectionStatus";
 import { BlynkSettingsDialog } from "@/components/BlynkSettingsDialog";
 import { NotificationHistory } from "@/components/NotificationHistory";
 import { NotificationCenter } from "@/components/NotificationCenter";
+import { CoverStatusCard } from "@/components/CoverStatusCard";
 import { blynkService, type DeviceData } from "@/services/blynkService";
 import { toast } from "sonner";
 
@@ -117,6 +118,11 @@ const Index = () => {
           </div>
 
           <div className="grid grid-cols-1 gap-6">
+            <CoverStatusCard
+              windSpeed={deviceData?.windSpeed || 38}
+              humidity={deviceData?.humidity || 0}
+              temperature={deviceData?.temperature || 51}
+            />
             <NotificationHistory />
           </div>
         </div>

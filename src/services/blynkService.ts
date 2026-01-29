@@ -1,6 +1,7 @@
 // Service for connecting to Blynk IoT platform and handling real-time data
 import { toast } from "sonner";
 import { notificationService } from "./notificationService";
+import { weatherService } from "./weatherService";
 
 // Define types for our IoT device data
 export interface DeviceData {
@@ -114,6 +115,9 @@ class BlynkService {
   }
 
   private async fetchDeviceData(): Promise<DeviceData> {
+    // Fetch real weather data from weather service
+    const weatherData = await weatherService.getCurrentWeather('Manila,PH');
+    
     // Simulate fetching data from Blynk cloud
     // In a real app, this would make an API call to Blynk
     return new Promise(resolve => {
@@ -124,15 +128,21 @@ class BlynkService {
           return Math.max(0, Math.min(100, base + variationAmount));
         };
 
-        // Simulate small changes in readings
+        // Use real weather data if available, otherwise use simulated data
+        const temperature = weatherData ? weatherData.temperature : Math.round(variation(this.deviceData.temperature, 3));
+        const humidity = weatherData ? weatherData.humidity : Math.round(variation(this.deviceData.humidity, 5));
+        const uvIndex = weatherData ? weatherData.uvIndex : Math.max(0, Math.min(11, Math.round(variation(this.deviceData.uvIndex, 2))));
+        const windSpeed = weatherData ? weatherData.windSpeed : Math.max(0, Math.round(variation(this.deviceData.windSpeed, 3)));
+
+        // Simulate small changes in other readings
         const newData: DeviceData = {
           ...this.deviceData,
           batteryLevel: Math.round(variation(this.deviceData.batteryLevel, 2)),
           currentOutput: parseFloat((this.deviceData.currentOutput + (Math.random() * 10 - 5)).toFixed(2)),
-          temperature: Math.round(variation(this.deviceData.temperature, 3)),
-          humidity: Math.round(variation(this.deviceData.humidity, 5)),
-          uvIndex: Math.max(0, Math.min(11, Math.round(variation(this.deviceData.uvIndex, 2)))),
-          windSpeed: Math.max(0, Math.round(variation(this.deviceData.windSpeed, 3))),
+          temperature: temperature,
+          humidity: humidity,
+          uvIndex: uvIndex,
+          windSpeed: windSpeed,
           connected: true,
           lastUpdate: new Date(),
         };
@@ -158,6 +168,24 @@ class BlynkService {
           );
           
           return updatedData;
+        }
+        
+        // Handle dual-cover system
+        // If windy and humid, engage solid cover
+        if (newData.windSpeed > 15 && newData.humidity > 60) {
+          notificationService.notifyHardwareControl(
+            'cover_switch',
+            `Solid cover engaged for windy and humid conditions (wind: ${newData.windSpeed}km/h, humidity: ${newData.humidity}%)`,
+            'info'
+          );
+        } 
+        // If windy but not humid, engage perforated cover
+        else if (newData.windSpeed > 15 && newData.humidity <= 60) {
+          notificationService.notifyHardwareControl(
+            'cover_switch',
+            `Perforated cover engaged for windy and dry conditions (wind: ${newData.windSpeed}km/h, humidity: ${newData.humidity}%)`,
+            'info'
+          );
         }
         
         // If low humidity and good conditions and rack is retracted, suggest extending

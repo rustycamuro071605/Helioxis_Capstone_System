@@ -2,7 +2,7 @@ import { toast } from "sonner";
 
 export interface NotificationEvent {
   id: string;
-  type: 'movement' | 'transaction' | 'weather_alert' | 'system_status' | 'connection';
+  type: 'movement' | 'transaction' | 'weather_alert' | 'system_status' | 'connection' | 'hardware_control';
   title: string;
   message: string;
   timestamp: Date;
@@ -127,6 +127,19 @@ class NotificationService {
       message,
       connected ? 'success' : 'error',
       { connected, details }
+    );
+  }
+
+  public notifyHardwareControl(action: string, details: string, severity: NotificationEvent['severity'] = 'info'): void {
+    const title = `Hardware Control: ${action.charAt(0).toUpperCase() + action.slice(1)}`;
+    const message = details;
+    
+    this.notify(
+      'hardware_control',
+      title,
+      message,
+      severity,
+      { action, details }
     );
   }
 

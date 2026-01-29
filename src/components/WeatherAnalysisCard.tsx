@@ -39,6 +39,29 @@ export const WeatherAnalysisCard = ({
         "High Wind Speed", 
         "Wind speeds are above 20 km/h. Rack may have been retracted automatically for safety."
       );
+      
+      // Engage perforated cover in high winds
+      notificationService.notifyHardwareControl(
+        "cover_switch",
+        "Perforated cover engaged for high wind conditions (wind: " + windSpeed + " km/h)",
+        "info"
+      );
+    }
+    
+    if (windSpeed > 15 && humidity > 60) {
+      // Engage solid cover when windy and rainy/humid
+      notificationService.notifyHardwareControl(
+        "cover_switch",
+        "Solid cover engaged for windy and humid conditions (wind: " + windSpeed + " km/h, humidity: " + humidity + "%)",
+        "info"
+      );
+    } else if (windSpeed > 15 && humidity <= 60) {
+      // Engage perforated cover in windy but dry conditions
+      notificationService.notifyHardwareControl(
+        "cover_switch",
+        "Perforated cover engaged for windy and dry conditions (wind: " + windSpeed + " km/h, humidity: " + humidity + "%)",
+        "info"
+      );
     }
     
     if (temperature < 15) {
@@ -101,11 +124,18 @@ export const WeatherAnalysisCard = ({
     }
     
     if (windSpeed > 20) {
-      recs.push("High winds detected - rack may retract automatically.");
+      recs.push("High winds detected - rack may retract automatically. Perforated cover engaged.");
     }
     
     if (temperature < 15) {
       recs.push("Low temperatures - drying will be slower");
+    }
+    
+    // Dual-cover system recommendations
+    if (windSpeed > 15 && humidity > 60) {
+      recs.push("Windy and humid - solid cover engaged for protection.");
+    } else if (windSpeed > 15 && humidity <= 60) {
+      recs.push("Windy conditions - perforated cover engaged for airflow.");
     }
     
     if (recs.length === 0) {
