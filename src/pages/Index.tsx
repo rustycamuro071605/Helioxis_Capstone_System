@@ -27,10 +27,16 @@ const Index = () => {
   const currentUser = authService.getCurrentUser();
 
   useEffect(() => {
+    console.log('Index page loaded, checking for Google OAuth callback');
+    console.log('Current URL search params:', window.location.search);
+        
     // Handle OAuth callback when Google redirects back to the root URL
     const params = new URLSearchParams(window.location.search);
     const code = params.get('code');
     const error = params.get('error');
+        
+    console.log('Code param:', code);
+    console.log('Error param:', error);
     
     if (error) {
       console.error('Google OAuth error:', error);
@@ -49,12 +55,27 @@ const Index = () => {
           // Clean the URL to remove the code parameter
           window.history.replaceState({}, document.title, window.location.pathname);
           
+          console.log('Processing Google OAuth callback with code:', code);
+          
           // Handle the Google callback using the auth service
           const user = await authService.handleGoogleCallback(code);
           
+          console.log('Google auth result:', user);
+          console.log('Current auth state after Google login:', {
+            isAuthenticated: authService.isAuthenticated(),
+            currentUser: authService.getCurrentUser(),
+            localStorageUser: localStorage.getItem('user_session')
+          });
+          
           if (user) {
             toast.success(`Welcome, ${user.name}! Signed in with Google.`);
-            // Immediately navigate to ensure authentication state is set
+            // Force refresh auth state and navigate
+            authService.refreshAuthState();
+            console.log('Auth state after refresh:', {
+              isAuthenticated: authService.isAuthenticated(),
+              currentUser: authService.getCurrentUser()
+            });
+            // Navigate to dashboard
             navigate('/', { replace: true });
           } else {
             toast.error('Failed to authenticate with Google');

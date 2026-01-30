@@ -17,11 +17,11 @@ export const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) 
     const checkAuth = () => {
       // Log auth state for debugging
       const storedUser = localStorage.getItem('user_session');
-      const isAuthenticated = authService.isAuthenticated();
+      const initialIsAuthenticated = authService.isAuthenticated();
       
       console.log('ProtectedRoute check:', {
         storedUser,
-        isAuthenticated,
+        initialIsAuthenticated,
         currentUser: authService.getCurrentUser()
       });
       
@@ -30,10 +30,32 @@ export const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) 
       
       const finalIsAuthenticated = authService.isAuthenticated();
       
+      console.log('After refresh - isAuthenticated:', finalIsAuthenticated);
+      
       if (!finalIsAuthenticated) {
-        navigate("/login");
-        setLoading(false);
-        return;
+        // Double-check localStorage directly
+        const directCheck = !!localStorage.getItem('user_session');
+        console.log('Direct localStorage check:', directCheck);
+        
+        if (!directCheck) {
+          console.log('No user session found, redirecting to login');
+          navigate("/login");
+          setLoading(false);
+          return;
+        }
+        // If localStorage has data but authService says not authenticated, 
+        // force a refresh and try again
+        console.log('Found user session in localStorage, forcing refresh');
+        authService.refreshAuthState();
+        const afterSecondRefresh = authService.isAuthenticated();
+        console.log('After second refresh - isAuthenticated:', afterSecondRefresh);
+        
+        if (!afterSecondRefresh) {
+          console.log('Still not authenticated after second refresh, redirecting to login');
+          navigate("/login");
+          setLoading(false);
+          return;
+        }
       }
 
       if (requiredRole && !authService.hasRole(requiredRole)) {
@@ -42,6 +64,7 @@ export const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) 
         return;
       }
       
+      console.log('Authentication check passed, allowing access');
       setLoading(false);
     };
     
