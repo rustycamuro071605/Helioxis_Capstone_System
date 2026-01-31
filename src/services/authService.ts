@@ -43,8 +43,12 @@ class AuthService {
   }
 
   private saveSession(): void {
+    console.log('saveSession() called with currentUser:', this.currentUser);
     if (this.currentUser) {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.currentUser));
+      console.log('Saved to localStorage with key:', this.STORAGE_KEY);
+    } else {
+      console.log('currentUser is null, not saving to localStorage');
     }
   }
 
@@ -115,6 +119,8 @@ class AuthService {
 
   // Method to handle the callback from Google OAuth
   public async handleGoogleCallback(code: string): Promise<User | null> {
+    console.log('handleGoogleCallback called with code:', code);
+    
     try {
       // In a real app, this would be called after Google redirects back to our app
       // We would exchange the authorization code for access tokens
@@ -141,8 +147,13 @@ class AuthService {
         role: "user"
       };
       
+      console.log('Creating Google user:', googleUser);
+      
       this.currentUser = googleUser;
+      console.log('Setting currentUser in authService:', this.currentUser);
+      
       this.saveSession();
+      console.log('saveSession() called');
       
       // Double-check the session is saved
       const storedUser = localStorage.getItem(this.STORAGE_KEY);

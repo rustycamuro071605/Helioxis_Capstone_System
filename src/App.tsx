@@ -29,6 +29,10 @@ const router = createBrowserRouter(
       element: <UnauthorizedPage />
     },
     {
+      path: "/auth/google/callback",
+      element: <GoogleCallbackPage />
+    },
+    {
       path: "/",
       element: (
         <ProtectedRoute>

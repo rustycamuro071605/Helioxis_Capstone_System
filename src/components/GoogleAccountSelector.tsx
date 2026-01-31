@@ -17,6 +17,8 @@ interface GoogleAccountSelectorProps {
 }
 
 export const GoogleAccountSelector = ({ onSelectAccount, onCancel }: GoogleAccountSelectorProps) => {
+  console.log('GoogleAccountSelector rendered');
+  
   const [accounts, setAccounts] = useState<GoogleAccount[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,12 +35,15 @@ export const GoogleAccountSelector = ({ onSelectAccount, onCancel }: GoogleAccou
         
         // In a real app, we would redirect to Google's OAuth URL
         // For now, we'll simulate this by redirecting after a brief moment
+        console.log('Initiating Google OAuth flow');
+        
         setTimeout(() => {
           // Use your actual Google OAuth credentials
           // Make sure this redirect URI matches what you configured in Google Cloud Console
-          const clientId = '511789621559-p9gl974uls3j9tv9oclt5qnoishlkg7h.apps.googleusercontent.com';
+          const clientId = '511789621559-i6anutmjcufjibht16o64c4q2ciikadv.apps.googleusercontent.com';
           
           // IMPORTANT: Make sure this redirect URI matches exactly what you registered in Google Cloud Console
+<<<<<<< HEAD
           // For Google OAuth, we need to redirect to the GoogleCallback page
           const redirectUri = `${window.location.origin}/google-callback`;
           
@@ -51,6 +56,22 @@ export const GoogleAccountSelector = ({ onSelectAccount, onCancel }: GoogleAccou
           if (window.location.port === '8080') {
             console.log('Using port 8080 as requested');
           }
+=======
+          // For Google OAuth, we use the callback route
+          const redirectUri = 'http://localhost:8080/auth/google/callback';
+          
+          console.log('Window location origin:', window.location.origin);
+          
+          // Check what's currently in localStorage
+          console.log('Current localStorage contents:', {
+            user_session: localStorage.getItem('user_session'),
+            all_keys: Object.keys(localStorage)
+          });
+          
+          // Log the redirect URI for debugging
+          console.log('Redirect URI being sent to Google:', redirectUri);
+          console.log('Full window.location:', window.location);
+>>>>>>> a080b8c0bc6bc5bc6deddbf335448bb506aea5ae
           
           const params = new URLSearchParams({
             client_id: clientId,

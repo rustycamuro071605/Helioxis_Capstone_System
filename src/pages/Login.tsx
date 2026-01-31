@@ -44,7 +44,15 @@ export const LoginPage = () => {
 
     setIsLoading(true);
     try {
+      console.log('Attempting regular login with credentials:', credentials);
       const user = await authService.login(credentials);
+      console.log('Regular login result:', user);
+      console.log('Auth state after regular login:', {
+        isAuthenticated: authService.isAuthenticated(),
+        currentUser: authService.getCurrentUser(),
+        localStorageUser: localStorage.getItem('user_session')
+      });
+      
       if (user) {
         // Refresh auth state and navigate to dashboard
         authService.refreshAuthState();
@@ -214,6 +222,7 @@ export const LoginPage = () => {
                 variant="outline" 
                 className="w-full bg-gradient-to-r from-slate-700/50 to-slate-800/50 hover:from-slate-700/60 hover:to-slate-800/60 text-white border border-orange-500/30 py-6 text-lg font-medium transition-all duration-300 flex items-center justify-center gap-3 rounded-xl relative overflow-hidden group"
                 onClick={() => {
+                  console.log('Continue with Google button clicked');
                   setShowGoogleSelector(true);
                 }}
               >
