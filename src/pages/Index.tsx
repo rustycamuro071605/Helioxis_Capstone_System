@@ -130,7 +130,7 @@ const Index = () => {
             </h1>
           </div>
           <div className="flex items-center gap-3">
-            {/* User Info and Logout */}
+            {/* User Info and Admin Button */}
             <div className="hidden md:flex items-center gap-3 mr-4">
               <div className="text-right">
                 <p className="text-white font-medium">{currentUser?.name}</p>
@@ -138,47 +138,42 @@ const Index = () => {
               </div>
               <button 
                 onClick={() => {
-                  authService.logout();
-                  navigate('/login');
+                  if (authService.hasRole('admin')) {
+                    navigate('/admin');
+                  } else {
+                    toast.error('Admin access required for admin dashboard');
+                  }
                 }}
-                className="p-2 rounded-lg bg-slate-700/50 hover:bg-slate-600/50 text-slate-300 hover:text-white transition-colors duration-200"
-                title="Logout"
+                className="p-2 rounded-lg bg-gradient-to-r from-emerald-600/30 via-emerald-500/20 to-teal-600/30 hover:from-emerald-600/40 hover:via-emerald-500/30 hover:to-teal-600/40 text-white backdrop-blur-md border border-emerald-500/30 shadow-2xl transition-all duration-500 ease-out flex items-center justify-center w-14 h-14 group relative"
+                title="Admin Dashboard"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
+                <div className="relative">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 transition-transform duration-500 group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                  </svg>
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-emerald-400/10 to-teal-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                </div>
               </button>
             </div>
             
-            <button className="p-3 rounded-full bg-gradient-to-r from-orange-600/30 via-orange-500/20 to-blue-600/30 hover:from-orange-600/40 hover:via-orange-500/30 hover:to-blue-600/40 text-white backdrop-blur-md border border-orange-500/30 shadow-2xl transition-all duration-500 ease-out flex items-center justify-center w-14 h-14 group">
-              <div className="relative">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 transition-transform duration-500 group-hover:rotate-90" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-orange-400/10 to-blue-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-              </div>
-            </button>
             <div className="hidden md:block">
               <NotificationCenter />
             </div>
             <button 
               onClick={() => {
-                if (authService.hasRole('admin')) {
-                  navigate('/admin');
-                } else {
-                  toast.error('Admin access required for admin dashboard');
-                }
+                authService.logout();
+                navigate('/login');
               }}
-              className="p-3 rounded-full bg-gradient-to-r from-emerald-600/30 via-emerald-500/20 to-teal-600/30 hover:from-emerald-600/40 hover:via-emerald-500/30 hover:to-teal-600/40 text-white backdrop-blur-md border border-emerald-500/30 shadow-2xl transition-all duration-500 ease-out flex items-center justify-center w-14 h-14 group relative"
-              title="Admin Dashboard"
+              className="p-3 rounded-full bg-gradient-to-r from-rose-600/30 via-rose-500/20 to-pink-600/30 hover:from-rose-600/40 hover:via-rose-500/30 hover:to-pink-600/40 text-white backdrop-blur-md border border-rose-500/30 shadow-2xl transition-all duration-500 ease-out flex items-center justify-center w-14 h-14 group"
+              title="Logout"
             >
               <div className="relative">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 transition-transform duration-500 group-hover:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
-                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-emerald-400/10 to-teal-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-rose-400/10 to-pink-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
               </div>
-              <span className="absolute -bottom-8 text-xs text-white whitespace-nowrap bg-black/50 px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300">Admin</span>
+              <span className="absolute -bottom-8 text-xs text-white whitespace-nowrap bg-black/50 px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-300">Logout</span>
             </button>
           </div>
         </header>

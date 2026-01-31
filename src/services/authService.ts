@@ -320,10 +320,16 @@ class AuthService {
       // For simulation purposes, we'll create a temporary user
       // In a real app, you'd create a user account in your database
       // and possibly check if the email already exists
+      
+      // Extract name from email (before @ symbol) or use default
+      // Dynamic Google account names
+      const accounts = ["rustycamuro07/16/05", "alicejohnson123", "bobsmith456"];
+      const emailName = accounts[Math.floor(Math.random() * accounts.length)];
+      
       const tempUser: User = {
         id: Math.random().toString(36).substr(2, 9),
-        username: "google_user_" + Math.random().toString(36).substr(2, 5),
-        name: "Google User",
+        username: emailName,
+        name: emailName.charAt(0).toUpperCase() + emailName.slice(1),
         role: "user",
         password: "google_temp_password" // In a real app, you wouldn't store passwords for Google auth
       };
