@@ -5,28 +5,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Eye, EyeOff, Sun, Chrome } from "lucide-react";
-import { authService, type User } from "@/services/authService";
+import { authService, type RegisterCredentials } from "@/services/authService";
 import { GoogleAccountSelector } from "@/components/GoogleAccountSelector";
 import { toast } from "sonner";
-
-export interface RegisterCredentials {
-  username: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  name: string;
-}
 
 export const RegisterPage = () => {
   const [credentials, setCredentials] = useState<RegisterCredentials>({
     username: "",
     email: "",
     password: "",
-    confirmPassword: "",
     name: ""
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showGoogleSelector, setShowGoogleSelector] = useState(false);
   const navigate = useNavigate();
@@ -40,13 +30,8 @@ export const RegisterPage = () => {
   };
 
   const validateForm = (): boolean => {
-    if (!credentials.username || !credentials.email || !credentials.password || !credentials.confirmPassword || !credentials.name) {
+    if (!credentials.username || !credentials.email || !credentials.password || !credentials.name) {
       toast.error("Please fill in all fields");
-      return false;
-    }
-
-    if (credentials.password !== credentials.confirmPassword) {
-      toast.error("Passwords do not match");
       return false;
     }
 
@@ -76,24 +61,21 @@ export const RegisterPage = () => {
     console.log("Form validation passed, proceeding with registration"); // Debug log
     setIsLoading(true);
     try {
-      // In a real app, this would call your backend API to register the user
-      // For now, we'll create a user account and auto-login
-      const newUser: User = {
-        id: Math.random().toString(36).substr(2, 9),
-        username: credentials.username,
-        name: credentials.name,
-        role: "user"
-      };
+      // Register the user with pending status
+      const result = await authService.register(credentials);
       
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Set the current user (simulate login after registration)
-      authService.setCurrentUser(newUser);
-      
-      toast.success(`Welcome, ${credentials.name}! Account created successfully.`);
-      // Direct navigation instead of setTimeout
-      navigate("/");
+      if (result) {
+        // This shouldn't happen since register returns null for pending users
+        toast.success(`Welcome, ${credentials.name}! Your account has been created.`);
+        navigate("/");
+      } else {
+        // User registration was successful but account is pending approval
+        toast.info("Your account has been created and is pending admin approval. You will be notified once approved.");
+        // Navigate to login page since the account isn't active yet
+        setTimeout(() => {
+          navigate("/login");
+        }, 2000);
+      }
     } catch (error) {
       console.error("Registration error:", error);
       toast.error("Registration failed. Please try again.");
@@ -103,10 +85,6 @@ export const RegisterPage = () => {
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
-  };
-
-  const toggleConfirmPasswordVisibility = () => {
-    setShowConfirmPassword(!showConfirmPassword);
   };
 
   return (
@@ -256,30 +234,6 @@ export const RegisterPage = () => {
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-orange-400 hover:text-orange-300 transition-colors"
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-              </div>
-              
-              <div className="space-y-2 relative z-10">
-                <Label htmlFor="confirmPassword" className="text-slate-300">Confirm Password</Label>
-                <div className="relative">
-                  <Input
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    type={showConfirmPassword ? "text" : "password"}
-                    placeholder="Confirm your password"
-                    value={credentials.confirmPassword}
-                    onChange={handleInputChange}
-                    className="bg-gradient-to-br from-slate-700/40 to-slate-800/40 border border-orange-500/30 text-white placeholder:text-slate-400 focus:ring-orange-500 focus:border-orange-500 rounded-xl py-3 pr-10"
-                    required
-                    autoComplete="new-password"
-                  />
-                  <button
-                    type="button"
-                    onClick={toggleConfirmPasswordVisibility}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-orange-400 hover:text-orange-300 transition-colors"
-                  >
-                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
               </div>

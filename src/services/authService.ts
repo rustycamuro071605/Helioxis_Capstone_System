@@ -1,10 +1,4 @@
-// Authentication service for handling login/logout functionality
 import { toast } from "sonner";
-
-export interface LoginCredentials {
-  username: string;
-  password: string;
-}
 
 export interface User {
   id: string;
@@ -14,11 +8,26 @@ export interface User {
   password: string;
 }
 
+// Interface for pending users awaiting approval
+export interface PendingUser {
+  id: string;
+  username: string;
+  name: string;
+  email: string;
+  role: 'user';
+  password: string;
+  createdAt: string;
+  approved: boolean;
+  approvedBy?: string;
+  approvedAt?: string;
+}
+
 class AuthService {
   private static instance: AuthService;
   private currentUser: User | null = null;
   private readonly STORAGE_KEY = "user_session";
   private readonly USERS_KEY = "registered_users";
+  private readonly PENDING_USERS_KEY = "pending_users";
 
   private constructor() {
     // Check for existing session on initialization
@@ -71,6 +80,15 @@ class AuthService {
     localStorage.setItem(this.USERS_KEY, JSON.stringify(users));
   }
 
+  private getPendingUsers(): PendingUser[] {
+    const pendingUsers = localStorage.getItem(this.PENDING_USERS_KEY);
+    return pendingUsers ? JSON.parse(pendingUsers) : [];
+  }
+
+  private savePendingUsers(users: PendingUser[]): void {
+    localStorage.setItem(this.PENDING_USERS_KEY, JSON.stringify(users));
+  }
+
   private saveSession(): void {
     console.log('saveSession() called with currentUser:', this.currentUser);
     if (this.currentUser) {
@@ -94,6 +112,16 @@ class AuthService {
 
       if (!user) {
         toast.error("Invalid username or password. Please check your credentials.");
+        return null;
+      }
+
+      // Verify that this user is not still in pending state
+      const pendingUsers = this.getPendingUsers();
+      const pendingUser = pendingUsers.find(u => u.username === credentials.username);
+      
+      // If user exists in both registered and pending lists, check if still pending
+      if (pendingUser && !pendingUser.approved) {
+        toast.error("Your account is still pending admin approval. Please wait for approval.");
         return null;
       }
 
@@ -149,44 +177,126 @@ class AuthService {
   }
 
   // Method to handle the callback from Google OAuth
-  public async register(credentials: LoginCredentials, role: 'admin' | 'user'): Promise<User | null> {
+  public async register(credentials: RegisterCredentials, role: 'admin' | 'user' = 'user'): Promise<User | null> {
     try {
       // Simulate API call delay
       await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Check if username already exists
+      // Check if username already exists in registered or pending users
       const registeredUsers = this.getRegisteredUsers();
       const existingUser = registeredUsers.find(u => u.username === credentials.username);
+      const pendingUsers = this.getPendingUsers();
+      const existingPendingUser = pendingUsers.find(u => u.username === credentials.username);
       
-      if (existingUser) {
+      if (existingUser || existingPendingUser) {
         toast.error("Username already exists. Please choose a different username.");
         return null;
       }
 
-      // Create new user
-      const newUser: User = {
+      // Create new user in pending state
+      const newPendingUser: PendingUser = {
         id: Math.random().toString(36).substr(2, 9),
         username: credentials.username,
-        name: credentials.username.charAt(0).toUpperCase() + credentials.username.slice(1),
-        role: role,
-        password: credentials.password
+        name: credentials.name,
+        email: credentials.email,
+        role: 'user',
+        password: credentials.password,
+        createdAt: new Date().toISOString(),
+        approved: false
       };
 
-      // Save to registered users
-      registeredUsers.push(newUser);
-      this.saveRegisteredUsers(registeredUsers);
+      // Save to pending users
+      pendingUsers.push(newPendingUser);
+      this.savePendingUsers(pendingUsers);
 
-      // Automatically log in the new user
-      this.currentUser = newUser;
-      this.saveSession();
-      
-      toast.success(`Account created successfully! Welcome, ${newUser.name}!`);
-      return this.currentUser;
+      // Show a message indicating the account is pending approval
+      toast.info("Your account has been created and is pending admin approval. You will be notified once approved.");
+      return null; // Return null since the account isn't active yet
     } catch (error) {
       console.error("Registration error:", error);
       toast.error("Registration failed. Please try again.");
       return null;
     }
+  }
+
+  // Method to approve a pending user
+  public async approveUser(userId: string): Promise<boolean> {
+    try {
+      const pendingUsers = this.getPendingUsers();
+      const userIndex = pendingUsers.findIndex(u => u.id === userId);
+      
+      if (userIndex === -1) {
+        console.error("User not found in pending users");
+        return false;
+      }
+
+      // Get the pending user
+      const pendingUser = pendingUsers[userIndex];
+      
+      // Update the pending user with approval info
+      const approvedUser: PendingUser = {
+        ...pendingUser,
+        approved: true,
+        approvedBy: this.currentUser?.username || 'admin',
+        approvedAt: new Date().toISOString()
+      };
+
+      // Replace the user in the pending list with the approved version
+      pendingUsers[userIndex] = approvedUser;
+      this.savePendingUsers(pendingUsers);
+
+      // Convert to active user (remove approval-specific fields)
+      const activeUser: User = {
+        id: pendingUser.id,
+        username: pendingUser.username,
+        name: pendingUser.name,
+        role: pendingUser.role,
+        password: pendingUser.password
+      };
+
+      // Add to registered users
+      const registeredUsers = this.getRegisteredUsers();
+      // Check if user already exists to avoid duplicates
+      const userExists = registeredUsers.some(u => u.id === activeUser.id);
+      if (!userExists) {
+        registeredUsers.push(activeUser);
+      }
+      this.saveRegisteredUsers(registeredUsers);
+
+      console.log(`User ${userId} approved successfully`);
+      return true;
+    } catch (error) {
+      console.error("Error approving user:", error);
+      return false;
+    }
+  }
+
+  // Method to reject a pending user
+  public async rejectUser(userId: string): Promise<boolean> {
+    try {
+      const pendingUsers = this.getPendingUsers();
+      const userIndex = pendingUsers.findIndex(u => u.id === userId);
+      
+      if (userIndex === -1) {
+        console.error("User not found in pending users");
+        return false;
+      }
+
+      // Remove from pending users
+      pendingUsers.splice(userIndex, 1);
+      this.savePendingUsers(pendingUsers);
+
+      console.log(`User ${userId} rejected successfully`);
+      return true;
+    } catch (error) {
+      console.error("Error rejecting user:", error);
+      return false;
+    }
+  }
+
+  // Method to get all pending users
+  public getPendingUsersList(): PendingUser[] {
+    return this.getPendingUsers();
   }
 
   // Method to handle the callback from Google OAuth
@@ -206,38 +316,27 @@ class AuthService {
       // 1. Send code to your backend
       // 2. Backend exchanges code for tokens using client_id and client_secret
       // 3. Backend gets user info from Google's People API
-      // 4. Backend creates/updates user in your database
-      // 5. Backend returns user info to frontend
       
-      // Simulate processing
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const googleUser = {
-        id: `google_${Math.random().toString(36).substr(2, 9)}`,
-        username: `google_user_${Math.random().toString(36).substr(2, 5)}`,
-        name: "Google User", // In real app, this would come from Google's API
-        role: "user" as const,
-        password: "google_password"
+      // For simulation purposes, we'll create a temporary user
+      // In a real app, you'd create a user account in your database
+      // and possibly check if the email already exists
+      const tempUser: User = {
+        id: Math.random().toString(36).substr(2, 9),
+        username: "google_user_" + Math.random().toString(36).substr(2, 5),
+        name: "Google User",
+        role: "user",
+        password: "google_temp_password" // In a real app, you wouldn't store passwords for Google auth
       };
       
-      console.log('Creating Google user:', googleUser);
-      
-      this.currentUser = googleUser;
-      console.log('Setting currentUser in authService:', this.currentUser);
-      
+      // Save the user to localStorage
+      this.currentUser = tempUser;
       this.saveSession();
-      console.log('saveSession() called');
       
-      // Double-check the session is saved
-      const storedUser = localStorage.getItem(this.STORAGE_KEY);
-      console.log('Google auth - Stored user in localStorage:', storedUser);
-      console.log('Google auth - Current user in memory:', this.currentUser);
-      
-      toast.success(`Welcome, ${googleUser.name}! Signed in with Google.`);
-      return this.currentUser;
+      console.log('Google auth successful, user created:', tempUser);
+      return tempUser;
     } catch (error) {
-      console.error("Google callback error:", error);
-      toast.error("Google authentication failed. Please try again.");
+      console.error("Error in Google callback:", error);
+      toast.error("Error processing Google authentication. Please try again.");
       return null;
     }
   }
@@ -265,6 +364,27 @@ class AuthService {
         const user = JSON.parse(storedUser);
         // Always sync in-memory state with localStorage
         this.currentUser = user;
+        
+        // Additional check: verify this user is not still pending approval
+        // Get all registered users to confirm the user is in the approved list
+        const registeredUsers = this.getRegisteredUsers();
+        const userExistsInRegistered = registeredUsers.some(registeredUser => 
+          registeredUser.id === user.id
+        );
+        
+        if (!userExistsInRegistered) {
+          // User exists in session but not in registered users - might be pending
+          // Check if they're still in pending state
+          const pendingUsers = this.getPendingUsers();
+          const pendingUser = pendingUsers.find(p => p.id === user.id);
+          
+          // If user is still pending, they shouldn't be authenticated
+          if (pendingUser && !pendingUser.approved) {
+            this.logout(); // Remove session for pending user
+            return false;
+          }
+        }
+        
         return user !== null && user.id !== undefined;
       } catch (e) {
         console.error('Error parsing stored user:', e);
@@ -277,22 +397,9 @@ class AuthService {
     return false;
   }
 
-  public hasRole(requiredRole: 'admin' | 'user'): boolean {
+  public hasRole(requiredRole: string): boolean {
     if (!this.currentUser) return false;
-    
-    // Admin and maintainer are the same (both are 'admin' role)
-    if (requiredRole === 'admin') {
-      return this.currentUser.role === 'admin';
-    }
-    return true; // All users can access user-level features
-  }
-  
-  public isAdmin(): boolean {
-    return this.hasRole('admin');
-  }
-  
-  public isUser(): boolean {
-    return this.hasRole('user');
+    return this.currentUser.role === requiredRole;
   }
 
   public refreshAuthState(): void {
@@ -301,6 +408,26 @@ class AuthService {
     if (storedUser) {
       try {
         const user = JSON.parse(storedUser);
+        // Additional check: verify this user is not still pending approval
+        const registeredUsers = this.getRegisteredUsers();
+        const userExistsInRegistered = registeredUsers.some(registeredUser => 
+          registeredUser.id === user.id
+        );
+        
+        if (!userExistsInRegistered) {
+          // User exists in session but not in registered users - might be pending
+          const pendingUsers = this.getPendingUsers();
+          const pendingUser = pendingUsers.find(p => p.id === user.id);
+          
+          // If user is still pending, clear session and return null
+          if (pendingUser && !pendingUser.approved) {
+            this.currentUser = null;
+            localStorage.removeItem(this.STORAGE_KEY);
+            console.log('User still pending approval, clearing session');
+            return;
+          }
+        }
+        
         this.currentUser = user;
         console.log('Auth state refreshed from localStorage:', user);
       } catch (e) {
@@ -313,6 +440,18 @@ class AuthService {
       console.log('No stored auth state found');
     }
   }
+}
+
+export interface LoginCredentials {
+  username: string;
+  password: string;
+}
+
+export interface RegisterCredentials {
+  username: string;
+  email: string;
+  password: string;
+  name: string;
 }
 
 export const authService = AuthService.getInstance();

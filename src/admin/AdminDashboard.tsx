@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authService, type User } from '@/services/authService';
+import { authService, type User, type PendingUser } from '@/services/authService';
 import { blynkService } from '@/services/blynkService';
 
 interface Device {
@@ -15,9 +15,10 @@ interface Device {
 export const AdminDashboard = () => {
   const navigate = useNavigate();
   const [users, setUsers] = useState<User[]>([]);
+  const [pendingUsers, setPendingUsers] = useState<PendingUser[]>([]);
   const [devices, setDevices] = useState<Device[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'users' | 'devices'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'pending' | 'devices'>('users');
   const [error, setError] = useState<string | null>(null);
 
   // Check if user has admin privileges
@@ -30,14 +31,17 @@ export const AdminDashboard = () => {
     // Load users and devices
     const loadData = async () => {
       try {
-        // Simulate loading users (in a real app, this would come from an API)
-        const mockUsers: User[] = [
-          { id: '1', username: 'admin', name: 'Admin User', role: 'admin' },
-          { id: '2', username: 'maint', name: 'Maintenance User', role: 'maintainer' },
-          { id: '3', username: 'user', name: 'Regular User', role: 'user' },
+        // Load existing users (in a real app, this would come from an API)
+        const existingUsers = [
+          { id: '1', username: 'admin', name: 'Admin User', role: 'admin' as const, password: 'admin123' },
+          { id: '2', username: 'maint', name: 'Maintenance User', role: 'user' as const, password: 'maint123' },
+          { id: '3', username: 'user', name: 'Regular User', role: 'user' as const, password: 'user123' },
         ];
         
-        // Simulate loading devices (in a real app, this would come from an API)
+        // Load pending users from authService
+        const pendingUsersList = authService.getPendingUsersList();
+        
+        // Load devices (in a real app, this would come from an API)
         const mockDevices: Device[] = [
           { id: 'dev-001', name: 'Solar Rack #1', blynkId: 'BLYNK_ID_001', status: 'online', location: 'Building A, Rooftop', lastActive: '2023-05-15 10:30:45' },
           { id: 'dev-002', name: 'Solar Rack #2', blynkId: 'BLYNK_ID_002', status: 'online', location: 'Building B, Yard', lastActive: '2023-05-15 11:20:30' },
@@ -45,7 +49,8 @@ export const AdminDashboard = () => {
           { id: 'dev-004', name: 'Solar Rack #4', blynkId: 'BLYNK_ID_004', status: 'maintenance', location: 'Building D, Balcony', lastActive: '2023-05-15 09:15:10' },
         ];
 
-        setUsers(mockUsers);
+        setUsers(existingUsers);
+        setPendingUsers(pendingUsersList);
         setDevices(mockDevices);
       } catch (err) {
         setError('Failed to load data');
@@ -57,6 +62,48 @@ export const AdminDashboard = () => {
 
     loadData();
   }, []);
+
+  // Function to approve a user
+  const approveUser = async (userId: string) => {
+    try {
+      // Call the authService to approve the user
+      const success = await authService.approveUser(userId);
+      
+      if (success) {
+        // Refresh the pending users list
+        const updatedPendingUsers = authService.getPendingUsersList();
+        setPendingUsers(updatedPendingUsers);
+        
+        console.log(`User ${userId} approved successfully`);
+      } else {
+        console.error(`Failed to approve user ${userId}`);
+      }
+    } catch (error) {
+      console.error('Error approving user:', error);
+      setError('Failed to approve user');
+    }
+  };
+
+  // Function to reject a user
+  const rejectUser = async (userId: string) => {
+    try {
+      // Call the authService to reject the user
+      const success = await authService.rejectUser(userId);
+      
+      if (success) {
+        // Refresh the pending users list
+        const updatedPendingUsers = authService.getPendingUsersList();
+        setPendingUsers(updatedPendingUsers);
+        
+        console.log(`User ${userId} rejected successfully`);
+      } else {
+        console.error(`Failed to reject user ${userId}`);
+      }
+    } catch (error) {
+      console.error('Error rejecting user:', error);
+      setError('Failed to reject user');
+    }
+  };
 
   if (!authService.hasRole('admin')) {
     return (
@@ -126,7 +173,22 @@ export const AdminDashboard = () => {
               }`}
               onClick={() => setActiveTab('users')}
             >
-              Users Management
+              Active Users
+            </button>
+            <button
+              className={`pb-3 px-1 relative ${
+                activeTab === 'pending'
+                  ? 'text-emerald-400 border-b-2 border-emerald-400'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+              onClick={() => setActiveTab('pending')}
+            >
+              Pending Approvals
+              {pendingUsers.filter(u => !u.approved).length > 0 && (
+                <span className="ml-2 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {pendingUsers.filter(u => !u.approved).length}
+                </span>
+              )}
             </button>
             <button
               className={`pb-3 px-1 ${
@@ -147,9 +209,9 @@ export const AdminDashboard = () => {
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">User</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Email</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wager">Role</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wager">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wager">Joined</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Role</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Joined</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-700">
@@ -164,7 +226,6 @@ export const AdminDashboard = () => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full
                           ${user.role === 'admin' ? 'bg-purple-800/50 text-purple-300' :
-                            user.role === 'maintainer' ? 'bg-amber-800/50 text-amber-300' :
                             'bg-slate-700 text-slate-300'}`}
                         >
                           {user.role}
@@ -183,6 +244,101 @@ export const AdminDashboard = () => {
             </div>
           )}
 
+          {activeTab === 'pending' && (
+            <div className="overflow-x-auto">
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold text-white mb-2">Pending User Approvals</h3>
+                <p className="text-slate-400">Review and approve new user registrations</p>
+              </div>
+              
+              {pendingUsers.filter(u => !u.approved).length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="text-5xl mb-4">✅</div>
+                  <h4 className="text-xl font-medium text-white mb-2">No Pending Approvals</h4>
+                  <p className="text-slate-400">All user registrations have been processed</p>
+                </div>
+              ) : (
+                <table className="min-w-full divide-y divide-slate-700">
+                  <thead>
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">User</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Email</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Registration Date</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-700">
+                    {pendingUsers.filter(u => !u.approved).map((user) => (
+                      <tr key={user.id} className="hover:bg-slate-700/30">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="text-sm font-medium text-white">{user.name}</div>
+                          <div className="text-sm text-slate-400">@{user.username}</div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                          {user.email}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                          {user.createdAt}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => approveUser(user.id)}
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded text-sm transition-colors"
+                            >
+                              Approve
+                            </button>
+                            <button
+                              onClick={() => rejectUser(user.id)}
+                              className="bg-rose-600 hover:bg-rose-700 text-white px-3 py-1 rounded text-sm transition-colors"
+                            >
+                              Reject
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+              
+              {/* Approved users section */}
+              {pendingUsers.filter(u => u.approved).length > 0 && (
+                <div className="mt-8">
+                  <h4 className="text-lg font-semibold text-white mb-4">Recently Approved Users</h4>
+                  <table className="min-w-full divide-y divide-slate-700">
+                    <thead>
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">User</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Email</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Approved By</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Approved At</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-700">
+                      {pendingUsers.filter(u => u.approved).map((user) => (
+                        <tr key={user.id} className="hover:bg-slate-700/30">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="text-sm font-medium text-white">{user.name}</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                            {user.email}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                            {user.approvedBy || 'N/A'}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-slate-300">
+                            {user.approvedAt || 'N/A'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+
           {activeTab === 'devices' && (
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-slate-700">
@@ -191,8 +347,8 @@ export const AdminDashboard = () => {
                     <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Device</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Blynk ID</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Location</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wager">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wager">Last Active</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-400 uppercase tracking-wider">Last Active</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-700">
@@ -234,6 +390,10 @@ export const AdminDashboard = () => {
               <div className="flex justify-between">
                 <span className="text-slate-400">Total Users</span>
                 <span className="text-white font-medium">{users.length}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Pending Approvals</span>
+                <span className="text-white font-medium">{pendingUsers.filter(u => !u.approved).length}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-400">Deployed Devices</span>
