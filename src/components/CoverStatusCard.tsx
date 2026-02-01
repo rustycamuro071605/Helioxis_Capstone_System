@@ -27,46 +27,66 @@ export const CoverStatusCard = ({ windSpeed, humidity, temperature }: CoverStatu
   }
 
   return (
-    <Card className={`p-6 bg-gradient-to-br from-slate-800/60 to-slate-900/60 backdrop-blur-sm rounded-3xl shadow-2xl border border-slate-700/50 ${coverBgColor} transition-all duration-500 hover:shadow-orange-500/30 hover:scale-[1.03]`}>
-      <div className="flex items-center gap-3 mb-4">
-        <div className="p-3 bg-gradient-to-br from-slate-700/70 to-slate-800/70 rounded-xl border border-slate-600/40 shadow-inner">
+    <Card className={`p-7 bg-gradient-to-br from-slate-800/70 to-slate-900/70 backdrop-blur-md rounded-3xl shadow-2xl border-2 border-slate-700/50 ${coverBgColor} transition-all duration-500 hover:shadow-2xl hover:scale-[1.02] group`}>
+      <div className="flex items-center gap-4 mb-6">
+        <div className={`p-4 rounded-2xl border-2 transition-all duration-300 group-hover:scale-110 ${
+          coverType === 'solid' 
+            ? 'bg-gradient-to-br from-slate-700/50 to-slate-800/50 border-slate-600/50 shadow-lg' 
+            : coverType === 'perforated' 
+            ? 'bg-gradient-to-br from-slate-700/50 to-slate-800/50 border-slate-600/50 shadow-lg' 
+            : 'bg-gradient-to-br from-slate-700/50 to-slate-800/50 border-slate-600/50'
+        }`}>
           {coverType === 'solid' ? (
-            <Shield className={`h-6 w-6 ${coverColor.replace('text-blue-400', 'text-orange-400').replace('text-orange-400', 'text-orange-500')}`} />
+            <Shield className={`h-7 w-7 ${coverColor.replace('text-blue-400', 'text-orange-400').replace('text-orange-400', 'text-orange-500')}`} />
           ) : coverType === 'perforated' ? (
-            <Wind className={`h-6 w-6 ${coverColor.replace('text-blue-400', 'text-orange-400').replace('text-orange-400', 'text-orange-500')}`} />
+            <Wind className={`h-7 w-7 ${coverColor.replace('text-blue-400', 'text-orange-400').replace('text-orange-400', 'text-orange-500')}`} />
           ) : (
-            <Sun className="h-6 w-6 text-gray-400" />
+            <Sun className="h-7 w-7 text-gray-400" />
           )}
         </div>
-        <h2 className="text-2xl font-semibold text-white bg-gradient-to-r from-orange-400 to-amber-400 bg-clip-text text-transparent">Cover Status</h2>
+        <div>
+          <h2 className="text-2xl font-bold text-white">Cover Status</h2>
+          <p className={`text-sm font-medium ${coverColor.replace('text-blue-400', 'text-orange-400').replace('text-orange-400', 'text-orange-500')}`}>
+            {coverType === 'none' ? 'Standard Protection' : 
+             coverType === 'solid' ? 'Full Protection Mode' : 'Ventilation Mode'}
+          </p>
+        </div>
       </div>
 
-      <div className="space-y-4">
-        <div className="flex items-center justify-between p-4 bg-gradient-to-br from-slate-700/40 to-slate-800/40 rounded-xl border border-slate-600/40 shadow-inner">
-          <span className="text-gray-300">Active Cover</span>
-          <span className={`font-bold ${coverColor.replace('text-blue-400', 'text-orange-400').replace('text-orange-400', 'text-orange-500')} capitalize`}>
-            {coverType === 'none' ? 'Standard' : coverType}
-          </span>
-        </div>
-
-        <div className="p-4 bg-gradient-to-br from-slate-700/40 to-slate-800/40 rounded-xl border border-slate-600/40 shadow-inner">
+      <div className="space-y-5">
+        <div className="p-5 bg-gradient-to-br from-slate-700/50 to-slate-800/50 rounded-2xl border border-slate-600/50">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-gray-300 font-medium">Current Cover</span>
+            <span className={`px-3 py-1 rounded-full text-sm font-bold ${coverColor.replace('text-blue-400', 'text-orange-400').replace('text-orange-400', 'text-orange-500')} capitalize`}>
+              {coverType === 'none' ? 'Standard' : coverType}
+            </span>
+          </div>
           <p className={`text-sm ${coverColor.replace('text-blue-400', 'text-orange-400').replace('text-orange-400', 'text-orange-500')}`}>
             {coverDescription}
           </p>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
-          <div className="p-4 bg-gradient-to-br from-slate-700/40 to-slate-800/40 rounded-xl text-center border border-slate-600/40 shadow-inner">
-            <div className="text-3xl font-bold text-white">{windSpeed}</div>
-            <div className="text-xs text-gray-400">Wind km/h</div>
+        <div className="grid grid-cols-3 gap-3">
+          <div className="p-4 bg-gradient-to-br from-slate-700/50 to-slate-800/50 rounded-2xl text-center border border-slate-600/50 hover:from-slate-700/60 hover:to-slate-800/60 transition-all duration-300">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <Wind className="h-5 w-5 text-blue-400" />
+              <div className="text-2xl font-bold text-white">{windSpeed}</div>
+            </div>
+            <div className="text-xs text-gray-400 font-medium">Wind km/h</div>
           </div>
-          <div className="p-4 bg-gradient-to-br from-slate-700/40 to-slate-800/40 rounded-xl text-center border border-slate-600/40 shadow-inner">
-            <div className="text-3xl font-bold text-white">{humidity}%</div>
-            <div className="text-xs text-gray-400">Humidity</div>
+          <div className="p-4 bg-gradient-to-br from-slate-700/50 to-slate-800/50 rounded-2xl text-center border border-slate-600/50 hover:from-slate-700/60 hover:to-slate-800/60 transition-all duration-300">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <Droplets className="h-5 w-5 text-cyan-400" />
+              <div className="text-2xl font-bold text-white">{humidity}%</div>
+            </div>
+            <div className="text-xs text-gray-400 font-medium">Humidity</div>
           </div>
-          <div className="p-4 bg-gradient-to-br from-slate-700/40 to-slate-800/40 rounded-xl text-center border border-slate-600/40 shadow-inner">
-            <div className="text-3xl font-bold text-white">{temperature}°C</div>
-            <div className="text-xs text-gray-400">Temp</div>
+          <div className="p-4 bg-gradient-to-br from-slate-700/50 to-slate-800/50 rounded-2xl text-center border border-slate-600/50 hover:from-slate-700/60 hover:to-slate-800/60 transition-all duration-300">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <Sun className="h-5 w-5 text-amber-400" />
+              <div className="text-2xl font-bold text-white">{temperature}°</div>
+            </div>
+            <div className="text-xs text-gray-400 font-medium">Temp</div>
           </div>
         </div>
       </div>

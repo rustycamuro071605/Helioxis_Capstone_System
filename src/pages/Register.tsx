@@ -276,7 +276,9 @@ export const RegisterPage = () => {
                   setShowGoogleSelector(true);
                 }}
               >
-                <Chrome className="h-5 w-5 text-orange-400" />
+                <div className="bg-white rounded-full p-1.5">
+                  <img src="/google.png" alt="Google" className="h-5 w-5" />
+                </div>
                 <span className="relative z-10">Continue with Google</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-orange-400/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </Button>
