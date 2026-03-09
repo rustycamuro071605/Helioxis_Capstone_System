@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff, Sun, Mail, Chrome } from "lucide-react";
+import { Eye, EyeOff, Sun, Mail, Chrome, Lock } from "lucide-react";
 import { authService, type LoginCredentials } from "@/services/authService";
 import { GoogleAccountSelector } from "@/components/GoogleAccountSelector";
 import { toast } from "sonner";
@@ -154,17 +154,20 @@ export const LoginPage = () => {
             <CardContent className="space-y-4">
               <div className="space-y-2 relative z-10">
                 <Label htmlFor="username" className="text-slate-300">Username</Label>
-                <Input
-                  id="username"
-                  name="username"
-                  type="text"
-                  placeholder="Enter your username"
-                  value={credentials.username}
-                  onChange={handleInputChange}
-                  className="bg-gradient-to-br from-slate-700/40 to-slate-800/40 border border-orange-500/30 text-white placeholder:text-slate-400 focus:ring-orange-500 focus:border-orange-500 rounded-xl py-3 pr-3"
-                  required
-                  autoComplete="username"
-                />
+                <div className="relative">
+                  <Input
+                    id="username"
+                    name="username"
+                    type="text"
+                    placeholder="Enter your username"
+                    value={credentials.username}
+                    onChange={handleInputChange}
+                    className="bg-gradient-to-br from-slate-700/40 to-slate-800/40 border border-orange-500/30 text-white placeholder:text-slate-400 focus:ring-orange-500 focus:border-orange-500 rounded-xl py-3 pr-3 pl-10"
+                    required
+                    autoComplete="username"
+                  />
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
+                </div>
               </div>
               
               <div className="space-y-2 relative z-10">
@@ -177,10 +180,13 @@ export const LoginPage = () => {
                     placeholder="Enter your password"
                     value={credentials.password}
                     onChange={handleInputChange}
-                    className="bg-gradient-to-br from-slate-700/40 to-slate-800/40 border border-orange-500/30 text-white placeholder:text-slate-400 focus:ring-orange-500 focus:border-orange-500 rounded-xl py-3 pr-10"
+                    className="bg-gradient-to-br from-slate-700/40 to-slate-800/40 border border-orange-500/30 text-white placeholder:text-slate-400 focus:ring-orange-500 focus:border-orange-500 rounded-xl py-3 pr-10 pl-10"
                     required
                     autoComplete="current-password"
                   />
+                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">
+                    <Lock className="h-4 w-4" />
+                  </div>
                   <button
                     type="button"
                     onClick={togglePasswordVisibility}
@@ -199,6 +205,7 @@ export const LoginPage = () => {
                 disabled={isLoading}
               >
                 <span className="relative z-10 flex items-center justify-center">
+                  <Sun className="h-5 w-5 mr-2" />
                   {isLoading ? (
                     <>
                       <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2"></div>

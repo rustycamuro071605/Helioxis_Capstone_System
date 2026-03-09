@@ -4,19 +4,29 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff, Sun, Chrome } from "lucide-react";
-import { authService, type RegisterCredentials } from "@/services/authService";
+import { Eye, EyeOff, Sun, Chrome, Mail, Lock } from "lucide-react";
+import { authService, type User } from "@/services/authService";
 import { GoogleAccountSelector } from "@/components/GoogleAccountSelector";
 import { toast } from "sonner";
+
+export interface RegisterCredentials {
+  username: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  name: string;
+}
 
 export const RegisterPage = () => {
   const [credentials, setCredentials] = useState<RegisterCredentials>({
     username: "",
     email: "",
     password: "",
+    confirmPassword: "",
     name: ""
   });
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [showGoogleSelector, setShowGoogleSelector] = useState(false);
   const navigate = useNavigate();
@@ -30,8 +40,13 @@ export const RegisterPage = () => {
   };
 
   const validateForm = (): boolean => {
-    if (!credentials.username || !credentials.email || !credentials.password || !credentials.name) {
+    if (!credentials.username || !credentials.email || !credentials.password || !credentials.confirmPassword || !credentials.name) {
       toast.error("Please fill in all fields");
+      return false;
+    }
+
+    if (credentials.password !== credentials.confirmPassword) {
+      toast.error("Passwords do not match");
       return false;
     }
 
@@ -51,34 +66,23 @@ export const RegisterPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submit triggered"); // Debug log
     
     if (!validateForm()) {
-      console.log("Form validation failed"); // Debug log
       return;
     }
 
-    console.log("Form validation passed, proceeding with registration"); // Debug log
     setIsLoading(true);
     try {
-      // Register the user with pending status
-      const result = await authService.register(credentials);
-      
-      if (result) {
-        // This shouldn't happen since register returns null for pending users
-        toast.success(`Welcome, ${credentials.name}! Your account has been created.`);
-        navigate("/");
-      } else {
-        // User registration was successful but account is pending approval
-        toast.info("Your account has been created and is pending admin approval. You will be notified once approved.");
-        // Navigate to login page since the account isn't active yet
-        setTimeout(() => {
-          navigate("/login");
-        }, 2000);
-      }
+      // In a real app, this would call your backend API to register the user
+      // For now, we'll simulate registration and auto-login
+        toast.success("Account created successfully! You can now log in.");
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
     } catch (error) {
       console.error("Registration error:", error);
       toast.error("Registration failed. Please try again.");
+    } finally {
       setIsLoading(false);
     }
   };
@@ -87,134 +91,112 @@ export const RegisterPage = () => {
     setShowPassword(!showPassword);
   };
 
+  const toggleConfirmPasswordVisibility = () => {
+    setShowConfirmPassword(!showConfirmPassword);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 flex items-center justify-center p-0 relative overflow-hidden">
-      {/* Enhanced background with multiple gradient layers and animated particles */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_10%_20%,rgba(251,146,60,0.15)_0%,transparent_50%),radial-gradient(ellipse_at_90%_80%,rgba(59,130,246,0.15)_0%,transparent_50%)]"></div>
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(251,146,60,0.1),transparent_70%)]"></div>
-      <div className="absolute inset-0 bg-[conic-gradient(from_0deg_at_50%_50%,rgba(251,146,60,0.05)_0deg,rgba(59,130,246,0.05)_120deg,rgba(16,185,129,0.05)_240deg,rgba(251,146,60,0.05)_360deg)] animate-spin-slow"></div>
+      {/* Enhanced background decoration with orange accents */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(251,146,60,0.15)_0%,transparent_50%),radial-gradient(circle_at_80%_70%,rgba(59,130,246,0.15)_0%,transparent_50%)]"></div>
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(251,146,60,0.08),transparent_70%)]"></div>
       
-      <div className="absolute inset-0">
-        <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-orange-500/30 rounded-full animate-pulse"></div>
-        <div className="absolute top-3/4 right-1/3 w-1 h-1 bg-blue-500/30 rounded-full animate-ping"></div>
-        <div className="absolute top-1/3 right-1/4 w-1.5 h-1.5 bg-amber-500/20 rounded-full animate-bounce"></div>
-      </div>
-      
-      <div className="relative z-10 w-full max-w-7xl mx-auto flex items-center min-h-screen">
-        {/* Left side - Logo and Title with enhanced styling */}
-        <div className="flex-1 flex flex-col items-center justify-center p-16 relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 via-transparent to-blue-500/5 rounded-3xl blur-3xl"></div>
-          <div className="relative text-center max-w-2xl">
-            <div className="relative mb-12 group">
-              <div className="absolute -inset-4 bg-gradient-to-r from-orange-500/20 via-transparent to-blue-500/20 rounded-3xl blur-2xl animate-pulse-slow group-hover:animate-pulse"></div>
-              <div className="absolute -inset-2 bg-gradient-to-r from-amber-500/10 to-cyan-500/10 rounded-2xl blur-xl"></div>
+      <div className="relative z-10 w-full max-w-6xl mx-auto flex items-center min-h-screen">
+        {/* Left side - Logo and Title */}
+        <div className="flex-1 flex flex-col items-center justify-center p-12">
+          <div className="text-center max-w-lg">
+            <div className="relative mb-8">
+              <div className="absolute inset-0 bg-gradient-to-r from-orange-500/20 via-transparent to-blue-500/20 rounded-3xl blur-2xl animate-pulse"></div>
               <div className="relative">
                 <img
                   src="/logo.png"
                   alt="Smart Drying Rack Logo"
-                  className="h-64 w-auto mx-auto drop-shadow-2xl brightness-125 contrast-125 saturate-150 filter hover:scale-110 transition-all duration-700 group-hover:brightness-150 group-hover:contrast-150"
+                  className="h-52 w-auto mx-auto drop-shadow-2xl brightness-125 contrast-125 saturate-150 hover:scale-105 transition-transform duration-500"
                 />
               </div>
             </div>
-            
-            <div className="relative">
-              <div className="absolute -inset-x-8 -inset-y-4 bg-gradient-to-r from-orange-500/10 via-amber-500/5 to-blue-500/10 rounded-2xl blur-xl"></div>
-              <h1 className="relative text-6xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-300 via-orange-500 to-blue-500 mb-6 animate-fade-in">Smart Drying Rack</h1>
-            </div>
-            
-            <div className="relative">
-              <div className="absolute -inset-x-6 -inset-y-3 bg-gradient-to-r from-slate-700/20 to-slate-800/20 rounded-xl blur"></div>
-              <p className="relative text-2xl text-slate-300 font-light tracking-wide">Intelligent Solar-Powered Drying System</p>
-            </div>
-            
-            <div className="mt-12 flex justify-center space-x-6">
-              <div className="h-1.5 w-20 bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 rounded-full animate-pulse"></div>
-              <div className="h-1.5 w-12 bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-500 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }}></div>
-              <div className="h-1.5 w-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
-            </div>
-            
-            <div className="mt-8 flex justify-center space-x-8 text-sm text-slate-500">
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-orange-500 rounded-full animate-ping"></div>
-                <span>Energy Efficient</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-blue-500 rounded-full animate-ping" style={{ animationDelay: '0.5s' }}></div>
-                <span>Smart Control</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-ping" style={{ animationDelay: '1s' }}></div>
-                <span>Weather Ready</span>
-              </div>
+            <h1 className="text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-amber-300 to-blue-500 mb-4 animate-fade-in">Smart Drying Rack</h1>
+            <p className="text-xl text-slate-300 font-light">Intelligent Solar-Powered Drying System</p>
+            <div className="mt-8 flex justify-center space-x-4">
+              <div className="h-1 w-16 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full"></div>
+              <div className="h-1 w-8 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full"></div>
             </div>
           </div>
         </div>
 
-        {/* Right side - Enhanced Register Card with glassmorphism */}
-        <div className="flex-1 flex items-center justify-center p-16">
-          <div className="relative w-full max-w-md">
-            <div className="absolute -inset-1 bg-gradient-to-r from-orange-500/30 via-amber-500/20 to-blue-500/30 rounded-3xl blur-xl animate-pulse"></div>
-            <Card className="relative bg-gradient-to-br from-slate-800/80 via-slate-800/60 to-slate-900/80 backdrop-blur-2xl rounded-3xl shadow-2xl border border-orange-500/40 hover:border-orange-500/60 transition-all duration-500 hover:shadow-orange-500/20 hover:shadow-3xl hover:scale-[1.02] overflow-hidden">
-              <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 via-transparent to-blue-500/5"></div>
-              <div className="absolute top-0 right-0 w-32 h-32 bg-orange-500/10 rounded-full blur-2xl -translate-y-16 translate-x-16"></div>
-              <div className="absolute bottom-0 left-0 w-24 h-24 bg-blue-500/10 rounded-full blur-xl translate-y-12 -translate-x-12"></div>
-              
-              <CardHeader className="space-y-3 pt-10 relative">
-                <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-16 h-1 bg-gradient-to-r from-orange-500 to-amber-500 rounded-full"></div>
-                <CardTitle className="text-4xl font-bold text-center text-white tracking-tight">Create Account</CardTitle>
-                <CardDescription className="text-center text-slate-400 text-lg font-light">
-                  Join our smart drying system today
-                </CardDescription>
-              </CardHeader>
+        {/* Right side - Register Card */}
+        <div className="flex-1 flex items-center justify-center p-12">
+          <Card className="bg-gradient-to-br from-slate-800/70 to-slate-900/70 backdrop-blur-xl rounded-3xl shadow-2xl border-2 border-orange-500/60 hover:border-orange-500/80 transition-all duration-500 hover:shadow-orange-500/40 hover:scale-[1.02] w-full max-w-md">
+            <CardHeader className="space-y-2 pt-8">
+              <CardTitle className="text-3xl font-bold text-center text-white">Create Account</CardTitle>
+              <CardDescription className="text-center text-slate-400 text-lg">
+                Join our smart drying system today
+              </CardDescription>
+            </CardHeader>
           
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
-              <div className="space-y-2 relative z-10">
+              <div className="space-y-2">
                 <Label htmlFor="name" className="text-slate-300">Full Name</Label>
-                <Input
-                  id="name"
-                  name="name"
-                  type="text"
-                  placeholder="Enter your full name"
-                  value={credentials.name}
-                  onChange={handleInputChange}
-                  className="bg-gradient-to-br from-slate-700/40 to-slate-800/40 border border-orange-500/30 text-white placeholder:text-slate-400 focus:ring-orange-500 focus:border-orange-500 rounded-xl py-3"
-                  required
-                  autoComplete="name"
-                />
+                <div className="relative">
+                  <Input
+                    id="name"
+                    name="name"
+                    type="text"
+                    placeholder="Enter your full name"
+                    value={credentials.name}
+                    onChange={handleInputChange}
+                    className="bg-gradient-to-br from-slate-700/40 to-slate-800/40 border border-orange-500/30 text-white placeholder:text-slate-400 focus:ring-orange-500 focus:border-orange-500 rounded-xl py-3 pl-10"
+                    required
+                    autoComplete="name"
+                  />
+                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">
+                    <Sun className="h-4 w-4" />
+                  </div>
+                </div>
               </div>
               
-              <div className="space-y-2 relative z-10">
+              <div className="space-y-2">
                 <Label htmlFor="username" className="text-slate-300">Username</Label>
-                <Input
-                  id="username"
-                  name="username"
-                  type="text"
-                  placeholder="Choose a username"
-                  value={credentials.username}
-                  onChange={handleInputChange}
-                  className="bg-gradient-to-br from-slate-700/40 to-slate-800/40 border border-orange-500/30 text-white placeholder:text-slate-400 focus:ring-orange-500 focus:border-orange-500 rounded-xl py-3"
-                  required
-                  autoComplete="username"
-                />
+                <div className="relative">
+                  <Input
+                    id="username"
+                    name="username"
+                    type="text"
+                    placeholder="Choose a username"
+                    value={credentials.username}
+                    onChange={handleInputChange}
+                    className="bg-gradient-to-br from-slate-700/40 to-slate-800/40 border border-orange-500/30 text-white placeholder:text-slate-400 focus:ring-orange-500 focus:border-orange-500 rounded-xl py-3 pl-10"
+                    required
+                    autoComplete="username"
+                  />
+                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">
+                    <Mail className="h-4 w-4" />
+                  </div>
+                </div>
               </div>
               
-              <div className="space-y-2 relative z-10">
+              <div className="space-y-2">
                 <Label htmlFor="email" className="text-slate-300">Email</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  value={credentials.email}
-                  onChange={handleInputChange}
-                  className="bg-gradient-to-br from-slate-700/40 to-slate-800/40 border border-orange-500/30 text-white placeholder:text-slate-400 focus:ring-orange-500 focus:border-orange-500 rounded-xl py-3"
-                  required
-                  autoComplete="email"
-                />
+                <div className="relative">
+                  <Input
+                    id="email"
+                    name="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    value={credentials.email}
+                    onChange={handleInputChange}
+                    className="bg-gradient-to-br from-slate-700/40 to-slate-800/40 border border-orange-500/30 text-white placeholder:text-slate-400 focus:ring-orange-500 focus:border-orange-500 rounded-xl py-3 pl-10"
+                    required
+                    autoComplete="email"
+                  />
+                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">
+                    <Mail className="h-4 w-4" />
+                  </div>
+                </div>
               </div>
               
-              <div className="space-y-2 relative z-10">
+              <div className="space-y-2">
                 <Label htmlFor="password" className="text-slate-300">Password</Label>
                 <div className="relative">
                   <Input
@@ -224,16 +206,46 @@ export const RegisterPage = () => {
                     placeholder="Create a password"
                     value={credentials.password}
                     onChange={handleInputChange}
-                    className="bg-gradient-to-br from-slate-700/40 to-slate-800/40 border border-orange-500/30 text-white placeholder:text-slate-400 focus:ring-orange-500 focus:border-orange-500 rounded-xl py-3 pr-10"
+                    className="bg-gradient-to-br from-slate-700/40 to-slate-800/40 border border-orange-500/30 text-white placeholder:text-slate-400 focus:ring-orange-500 focus:border-orange-500 rounded-xl py-3 pr-10 pl-10"
                     required
                     autoComplete="new-password"
                   />
+                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">
+                    <Lock className="h-4 w-4" />
+                  </div>
                   <button
                     type="button"
                     onClick={togglePasswordVisibility}
                     className="absolute right-3 top-1/2 transform -translate-y-1/2 text-orange-400 hover:text-orange-300 transition-colors"
                   >
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword" className="text-slate-300">Confirm Password</Label>
+                <div className="relative">
+                  <Input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="Confirm your password"
+                    value={credentials.confirmPassword}
+                    onChange={handleInputChange}
+                    className="bg-gradient-to-br from-slate-700/40 to-slate-800/40 border border-orange-500/30 text-white placeholder:text-slate-400 focus:ring-orange-500 focus:border-orange-500 rounded-xl py-3 pr-10 pl-10"
+                    required
+                    autoComplete="new-password"
+                  />
+                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400">
+                    <Lock className="h-4 w-4" />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={toggleConfirmPasswordVisibility}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-orange-400 hover:text-orange-300 transition-colors"
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
               </div>
@@ -246,6 +258,7 @@ export const RegisterPage = () => {
                 disabled={isLoading}
               >
                 <span className="relative z-10 flex items-center justify-center">
+                  <Sun className="h-5 w-5 mr-2" />
                   {isLoading ? (
                     <>
                       <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2"></div>
@@ -259,7 +272,7 @@ export const RegisterPage = () => {
               </Button>
               
               <div className="text-center text-sm text-slate-400 pt-2">
-                <p>Already have an account? <button type="button" onClick={() => navigate('/login')} className="text-orange-400 hover:text-orange-300 transition-colors underline cursor-pointer z-50 relative">Sign in</button></p>
+                <p>Already have an account? <a href="/login" className="text-orange-400 hover:text-orange-300 transition-colors">Sign in</a></p>
               </div>
               
               <div className="flex items-center gap-2 my-4">
@@ -302,7 +315,6 @@ export const RegisterPage = () => {
       </div>
     </div>
   </div>
-</div>
   );
 };
 

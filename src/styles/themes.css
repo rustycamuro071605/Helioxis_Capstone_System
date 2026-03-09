@@ -1,0 +1,1017 @@
+/* Theme CSS Variables */
+
+:root {
+
+  /* Default fallback variables (will be overridden by explicit theme selectors) */
+
+  --theme-primary: #a16207;
+
+  --theme-primary-light: #eab308;
+
+  --theme-primary-dark: #713f12;
+
+  --theme-secondary: #ca8a04;
+
+  --theme-accent: #d97706;
+
+  --theme-background: #fefce8;
+
+  --theme-background-light: #fef9c3;
+
+  --theme-text: #1c1917;
+
+  --theme-text-secondary: #57534e;
+
+  --theme-border: #d6d3d1;
+
+  --theme-card-bg: #fef9c3;
+
+  --theme-card-hover: #fde68a;
+
+  --theme-gradient-from: #a16207;
+
+  --theme-gradient-to: #eab308;
+
+  --theme-shadow: rgba(161, 98, 7, 0.2);
+
+  --theme-glow: rgba(234, 179, 8, 0.3);
+
+}
+
+
+
+/* Sun Theme Variables (explicit) - Light Gray & Brown Theme */
+
+[data-theme="sun"] {
+
+  --theme-primary: #fb923c; /* Orange-500 - matches UI orange */
+
+  --theme-primary-light: #fbbf24; /* Amber-400 - lighter accent */
+
+  --theme-primary-dark: #ea580c; /* Orange-600 - darker variant */
+
+  --theme-secondary: #3b82f6; /* Blue-500 - matches UI blue */
+
+  --theme-accent: #f59e0b; /* Amber-500 - warm accent */
+
+  --theme-background-start: #f8f8f8; /* Light gray background */
+
+  --theme-background-end: #f8f8f8; /* Light gray background */
+
+  --theme-background-solid: #f8f8f8; /* Light gray background */
+
+  --theme-background-light: #f0f0f0; /* Slightly darker light gray */
+
+  --theme-text: #333333; /* Darker text for readability */
+
+  --theme-text-secondary: #57534e; /* Warm brown */
+
+  --theme-border: #e0e0e0; /* Light gray border */
+
+  --theme-card-bg: #d3c3b0; /* Light brown/tan cards */
+
+  --theme-card-hover: #c7b7a4; /* Slightly darker brown for hover */
+
+  --theme-gradient-from: #fb923c; /* Orange */
+
+  --theme-gradient-to: #3b82f6; /* Blue */
+
+  --theme-shadow: rgba(0, 0, 0, 0.1); /* Subtle shadow */
+
+  --theme-glow: rgba(251, 146, 60, 0.25); /* Orange glow */
+
+}
+
+
+
+/* Moon Theme Variables */
+
+[data-theme="moon"] {
+
+  --theme-primary: #ffffff; /* Pure white */
+
+  --theme-primary-light: #22D3EE; /* Crater Cyan - hover color */
+
+  --theme-primary-dark: #000000; /* True Black */
+
+  --theme-secondary: #A7F3D0; /* Soft mint */
+
+  --theme-accent: #22D3EE; /* Crater Cyan for hover */
+
+  --theme-background-start: #000000; /* True Black base */
+
+  --theme-background-end: #111827; /* Deep charcoal */
+
+  --theme-background-light: #0A0A0A; /* Deep charcoal elevation */
+
+  --theme-text: #ffffff; /* Pure white */
+
+  --theme-text-secondary: #A7F3D0; /* Soft mint */
+
+  --theme-border: #1A1A1A; /* Darker charcoal */
+
+  --theme-card-bg: #0A0A0A; /* Deep charcoal elevation */
+
+  --theme-card-hover: #22D3EE; /* Crater Cyan on hover */
+
+  --theme-gradient-from: #000000; /* True Black */
+
+  --theme-gradient-to: #1A1A1A; /* Dark charcoal */
+
+  --theme-shadow: rgba(34, 211, 238, 0.3); /* Crater Cyan shadow */
+
+  --theme-glow: rgba(34, 211, 238, 0.5); /* Crater Cyan glow */
+
+
+
+  /* Alert colors for moon theme */
+
+  --theme-alert-error: #7F1D1D; /* Blood Moon - deep, dusty red */
+
+  --theme-alert-warning: #F59E0B; /* Harvest Amber - orange-gold */
+
+  --theme-alert-special: #1E40AF; /* Blue Moon - rare, deep cobalt */
+
+}
+
+
+
+/* Theme Transition */
+
+body {
+
+  background: linear-gradient(135deg, var(--theme-background-start) 0%, var(--theme-background-end) 100%);
+
+  color: var(--theme-text);
+
+  transition: all 0.3s ease-in-out;
+
+}
+
+
+
+[data-theme="sun"] body {
+
+  background: #f8f8f8 !important;
+
+  color: var(--theme-text) !important;
+
+}
+
+
+
+[data-theme="sun"] .min-h-screen {
+
+  background: #f8f8f8 !important;
+
+}
+
+
+
+[data-theme="moon"] body {
+
+  background: linear-gradient(135deg, var(--theme-background-start) 0%, var(--theme-background-end) 100%) !important;
+
+  color: var(--theme-text) !important;
+
+}
+
+
+
+[data-theme="moon"] .min-h-screen {
+
+  background: linear-gradient(135deg, var(--theme-background-start) 0%, var(--theme-background-end) 100%) !important;
+
+}
+
+
+
+/* Apply theme to all elements with smooth transitions */
+
+* {
+
+  transition: 
+
+    background-color 0.3s ease-in-out,
+
+    border-color 0.3s ease-in-out,
+
+    color 0.3s ease-in-out,
+
+    box-shadow 0.3s ease-in-out;
+
+}
+
+
+
+/* Theme-specific animations */
+
+@keyframes sunGlow {
+
+  0% { box-shadow: 0 0 20px var(--theme-glow); }
+
+  50% { box-shadow: 0 0 40px var(--theme-glow); }
+
+  100% { box-shadow: 0 0 20px var(--theme-glow); }
+
+}
+
+
+
+@keyframes moonGlow {
+
+  0% { 
+
+    box-shadow: 
+
+      0 0 15px var(--theme-glow),
+
+      0 0 30px rgba(34, 211, 238, 0.4),
+
+      inset 0 0 10px rgba(147, 197, 253, 0.2);
+
+  }
+
+  50% { 
+
+    box-shadow: 
+
+      0 0 25px var(--theme-glow),
+
+      0 0 50px rgba(34, 211, 238, 0.6),
+
+      inset 0 0 15px rgba(147, 197, 253, 0.4);
+
+  }
+
+  100% { 
+
+    box-shadow: 
+
+      0 0 15px var(--theme-glow),
+
+      0 0 30px rgba(34, 211, 238, 0.4),
+
+      inset 0 0 10px rgba(147, 197, 253, 0.2);
+
+  }
+
+}
+
+
+
+/* Hard edge shadow for moon theme */
+
+[data-theme="moon"] .hard-shadow {
+
+  box-shadow: 
+
+    0 10px 25px rgba(0, 0, 0, 0.5),
+
+    0 0 0 1px rgba(147, 197, 253, 0.3);
+
+  filter: drop-shadow(0 0 5px rgba(147, 197, 253, 0.5));
+
+}
+
+
+
+/* Pitch black shadows for moon theme */
+
+[data-theme="moon"] .pitch-shadow {
+
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(147, 197, 253, 0.2);
+
+}
+
+
+
+@keyframes themeTransition {
+
+  0% { opacity: 1; transform: scale(1); }
+
+  50% { opacity: 0.8; transform: scale(0.98); }
+
+  100% { opacity: 1; transform: scale(1); }
+
+}
+
+
+
+/* Theme transition overlay */
+
+.theme-transition-overlay {
+
+  position: fixed;
+
+  top: 0;
+
+  left: 0;
+
+  width: 100%;
+
+  height: 100%;
+
+  background: radial-gradient(circle, var(--theme-primary) 0%, transparent 70%);
+
+  opacity: 0;
+
+  pointer-events: none;
+
+  z-index: 9999;
+
+  transition: opacity 0.3s ease-in-out;
+
+}
+
+
+
+.theme-transition-overlay.active {
+
+  opacity: 0.1;
+
+  animation: themeTransition 0.3s ease-in-out;
+
+}
+
+
+
+/* Sun-specific styles */
+
+[data-theme="sun"] .sun-glow {
+
+  animation: sunGlow 3s ease-in-out infinite;
+
+}
+
+
+
+[data-theme="sun"] .sun-text-gradient {
+
+  background: linear-gradient(135deg, #fb923c, #f59e0b, #3b82f6);
+
+  -webkit-background-clip: text;
+
+  -webkit-text-fill-color: transparent;
+
+  background-clip: text;
+
+  font-weight: 700;
+
+  text-shadow: 0 2px 4px rgba(251, 146, 60, 0.3);
+
+}
+
+
+
+/* Sun theme notification dropdown */
+
+[data-theme="sun"] .absolute.right-0.mt-2.w-96 {
+
+  background: #d3c3b0 !important;
+
+  border: 1px solid #e0e0e0 !important;
+
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1) !important;
+
+}
+
+
+
+[data-theme="sun"] .bg-slate-800 {
+
+  background: #d3c3b0 !important;
+
+}
+
+
+
+[data-theme="sun"] .border-slate-700 {
+
+  border-color: #e0e0e0 !important;
+
+}
+
+
+
+[data-theme="sun"] .text-white {
+
+  color: #333333 !important;
+
+}
+
+
+
+[data-theme="sun"] .bg-slate-700\/50 {
+
+  background: rgba(195, 183, 164, 0.5) !important;
+
+}
+
+
+
+[data-theme="sun"] .border-slate-600\/30 {
+
+  border-color: rgba(224, 224, 224, 0.3) !important;
+
+}
+
+
+
+[data-theme="sun"] .hover\:bg-slate-700\/70:hover {
+
+  background: rgba(195, 183, 164, 0.7) !important;
+
+}
+
+
+
+[data-theme="sun"] .text-gray-400 {
+
+  color: #666666 !important;
+
+}
+
+
+
+[data-theme="sun"] .text-gray-300 {
+
+  color: #555555 !important;
+
+}
+
+
+
+/* Sun theme user info and buttons */
+
+[data-theme="sun"] .text-right p {
+
+  color: #333333 !important;
+
+}
+
+
+
+[data-theme="sun"] .text-slate-400 {
+
+  color: #666666 !important;
+
+}
+
+
+
+/* Override notification button for sun theme */
+
+[data-theme="sun"] button[class*="from-orange-600"] {
+
+  background: linear-gradient(135deg, #fb923c, #f59e0b) !important;
+
+  border: 1px solid #fb923c !important;
+
+  box-shadow: 0 4px 12px rgba(251, 146, 60, 0.15) !important;
+
+}
+
+
+
+[data-theme="sun"] button[class*="from-orange-600"]:hover {
+
+  background: linear-gradient(135deg, #ea580c, #d97706) !important;
+
+  box-shadow: 0 6px 16px rgba(251, 146, 60, 0.25) !important;
+
+}
+
+
+
+/* Override admin button for sun theme */
+
+[data-theme="sun"] button[class*="from-emerald-600"] {
+
+  background: linear-gradient(135deg, #fb923c, #3b82f6) !important;
+
+  border: 1px solid #fb923c !important;
+
+  box-shadow: 0 4px 12px rgba(251, 146, 60, 0.15) !important;
+
+}
+
+
+
+[data-theme="sun"] button[class*="from-emerald-600"]:hover {
+
+  background: linear-gradient(135deg, #ea580c, #2563eb) !important;
+
+  box-shadow: 0 6px 16px rgba(251, 146, 60, 0.25) !important;
+
+}
+
+
+
+/* Override logout button for sun theme */
+
+[data-theme="sun"] button[class*="from-rose-600"] {
+
+  background: linear-gradient(135deg, #fb923c, #ea580c) !important;
+
+  border: 1px solid #fb923c !important;
+
+  box-shadow: 0 4px 12px rgba(251, 146, 60, 0.15) !important;
+
+}
+
+
+
+[data-theme="sun"] button[class*="from-rose-600"]:hover {
+
+  background: linear-gradient(135deg, #ea580c, #dc2626) !important;
+
+  box-shadow: 0 6px 16px rgba(251, 146, 60, 0.25) !important;
+
+}
+
+
+
+/* Moon-specific styles */
+
+[data-theme="moon"] .moon-glow {
+
+  animation: moonGlow 4s ease-in-out infinite;
+
+}
+
+
+
+[data-theme="moon"] .sun-text-gradient {
+
+  background: linear-gradient(135deg, #ffffff, #22D3EE, #A7F3D0);
+
+  -webkit-background-clip: text;
+
+  -webkit-text-fill-color: transparent;
+
+  background-clip: text;
+
+  font-weight: 700;
+
+  text-shadow: 0 2px 4px rgba(34, 211, 238, 0.4);
+
+}
+
+
+
+/* Gradient backgrounds for themes */
+
+.sun-gradient {
+
+  background: linear-gradient(135deg, var(--theme-gradient-from), var(--theme-gradient-to));
+
+}
+
+
+
+.moon-gradient {
+
+  background: linear-gradient(135deg, var(--theme-gradient-from), var(--theme-gradient-to));
+
+}
+
+
+
+/* Card styles with theme support */
+
+.theme-card {
+
+  background: linear-gradient(135deg, var(--theme-card-bg), var(--theme-card-hover));
+
+  border: 1px solid var(--theme-border);
+
+  box-shadow: 0 10px 25px var(--theme-shadow);
+
+  position: relative;
+
+  overflow: hidden;
+
+}
+
+
+
+[data-theme="sun"] .theme-card {
+
+  background: #d3c3b0;
+
+  box-shadow: 
+
+    0 4px 12px rgba(0, 0, 0, 0.1),
+
+    0 2px 4px rgba(0, 0, 0, 0.05);
+
+  border: 1px solid #e0e0e0;
+
+  color: #333333;
+
+}
+
+
+
+[data-theme="sun"] .theme-card:hover {
+
+  box-shadow: 
+
+    0 6px 16px rgba(0, 0, 0, 0.15),
+
+    0 2px 8px rgba(0, 0, 0, 0.1);
+
+  transform: translateY(-2px);
+
+  background: #c7b7a4;
+
+  border-color: #fb923c;
+
+}
+
+
+
+.theme-card::before {
+
+  content: '';
+
+  position: absolute;
+
+  top: -2px;
+
+  left: -2px;
+
+  right: -2px;
+
+  bottom: -2px;
+
+  background: linear-gradient(45deg, 
+
+    var(--theme-gradient-from), 
+
+    var(--theme-gradient-to),
+
+    var(--theme-gradient-from));
+
+  z-index: -1;
+
+  border-radius: calc(var(--radius) + 2px);
+
+}
+
+
+
+[data-theme="moon"] .theme-card {
+
+  background: radial-gradient(circle at center, #0A0A0A 0%, #000000 100%);
+
+  box-shadow: 
+
+    0 10px 30px rgba(0, 0, 0, 0.8),
+
+    0 0 0 1px rgba(34, 211, 238, 0.1);
+
+  border: 1px solid rgba(34, 211, 238, 0.05);
+
+  position: relative;
+
+}
+
+
+
+[data-theme="moon"] .theme-card::before {
+
+  background: radial-gradient(circle at center, 
+
+    #000000, 
+
+    #22D3EE,
+
+    #A7F3D0,
+
+    #000000);
+
+  filter: blur(15px);
+
+  opacity: 0.1;
+
+}
+
+
+
+[data-theme="moon"] .theme-card::after {
+
+  content: '';
+
+  position: absolute;
+
+  top: 1px;
+
+  left: 1px;
+
+  right: 1px;
+
+  bottom: 1px;
+
+  border-radius: calc(var(--radius) - 2px);
+
+  box-shadow: inset 0 0 10px rgba(34, 211, 238, 0.1);
+
+  pointer-events: none;
+
+}
+
+
+
+.theme-card:hover {
+
+  transform: translateY(-5px);
+
+  box-shadow: 0 15px 35px var(--theme-glow);
+
+}
+
+
+
+[data-theme="moon"] .theme-card:hover {
+
+  box-shadow: 
+
+    0 15px 40px rgba(34, 211, 238, 0.4),
+
+    0 0 0 1px rgba(34, 211, 238, 0.2);
+
+  transform: translateY(-5px) scale(1.02);
+
+}
+
+
+
+/* Button styles with theme support */
+
+.theme-button {
+
+  background: linear-gradient(135deg, var(--theme-primary), var(--theme-accent));
+
+  border: none;
+
+  color: white;
+
+  padding: 12px 24px;
+
+  border-radius: 12px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.3s ease;
+
+  position: relative;
+
+  overflow: hidden;
+
+}
+
+
+
+.theme-button::before {
+
+  content: '';
+
+  position: absolute;
+
+  top: 0;
+
+  left: -100%;
+
+  width: 100%;
+
+  height: 100%;
+
+  background: linear-gradient(
+
+    90deg,
+
+    transparent,
+
+    rgba(255, 255, 255, 0.2),
+
+    transparent
+
+  );
+
+  transition: 0.5s;
+
+}
+
+
+
+.theme-button:hover {
+
+  transform: translateY(-2px);
+
+  box-shadow: 0 10px 20px var(--theme-glow);
+
+}
+
+
+
+.theme-button:hover::before {
+
+  left: 100%;
+
+}
+
+
+
+[data-theme="sun"] .theme-button {
+
+  background: linear-gradient(135deg, #fb923c, #3b82f6);
+
+  box-shadow: 
+
+    0 4px 8px rgba(251, 146, 60, 0.15),
+
+    0 2px 4px rgba(59, 130, 246, 0.1);
+
+  border: 1px solid #fb923c;
+
+  color: #ffffff;
+
+}
+
+
+
+[data-theme="sun"] .theme-button:hover {
+
+  background: linear-gradient(135deg, #ea580c, #2563eb);
+
+  box-shadow: 
+
+    0 6px 12px rgba(251, 146, 60, 0.2),
+
+    0 2px 6px rgba(59, 130, 246, 0.15);
+
+  transform: translateY(-1px);
+
+  border-color: #ea580c;
+
+}
+
+
+
+[data-theme="moon"] .theme-button {
+
+  background: linear-gradient(135deg, #ffffff, #22D3EE);
+
+  box-shadow: 
+
+    0 4px 15px rgba(34, 211, 238, 0.3),
+
+    inset 0 2px 4px rgba(255, 255, 255, 0.1);
+
+  border: 1px solid rgba(34, 211, 238, 0.3);
+
+  color: #000000;
+
+  background: radial-gradient(circle at center, #ffffff 0%, #A7F3D0 100%);
+
+}
+
+
+
+[data-theme="moon"] .theme-button:hover {
+
+  box-shadow: 
+
+    0 8px 25px rgba(34, 211, 238, 0.5),
+
+    0 0 15px rgba(34, 211, 238, 0.4),
+
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
+
+  transform: translateY(-2px) scale(1.05);
+
+}
+
+
+
+/* Text gradients */
+
+.theme-text-gradient {
+
+  background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
+
+  -webkit-background-clip: text;
+
+  -webkit-text-fill-color: transparent;
+
+  background-clip: text;
+
+}
+
+
+
+/* Moon theme specific elements */
+
+[data-theme="moon"] .earthshine-glow {
+
+  color: #ffffff;
+
+  text-shadow: 
+
+    0 0 8px rgba(34, 211, 238, 0.6),
+
+    0 0 16px rgba(34, 211, 238, 0.4),
+
+    0 0 24px rgba(34, 211, 238, 0.2);
+
+}
+
+
+
+[data-theme="moon"] .crater-cyan {
+
+  color: #22D3EE;
+
+  text-shadow: 
+
+    0 0 8px rgba(34, 211, 238, 0.6),
+
+    0 0 16px rgba(34, 211, 238, 0.4);
+
+}
+
+
+
+[data-theme="moon"] .ether-glow {
+
+  color: #A7F3D0;
+
+  text-shadow: 
+
+    0 0 6px rgba(167, 243, 208, 0.8),
+
+    0 0 12px rgba(167, 243, 208, 0.4);
+
+}
+
+
+
+/* Alert elements for moon theme */
+
+[data-theme="moon"] .blood-moon {
+
+  background: #7F1D1D;
+
+  box-shadow: 
+
+    0 0 15px rgba(127, 29, 29, 0.6),
+
+    0 0 0 1px rgba(127, 29, 29, 0.3);
+
+}
+
+
+
+[data-theme="moon"] .harvest-amber {
+
+  background: #F59E0B;
+
+  box-shadow: 
+
+    0 0 15px rgba(245, 158, 11, 0.6),
+
+    0 0 0 1px rgba(245, 158, 11, 0.3);
+
+}
+
+
+
+[data-theme="moon"] .blue-moon {
+
+  background: #1E40AF;
+
+  box-shadow: 
+
+    0 0 15px rgba(30, 64, 175, 0.6),
+
+    0 0 0 1px rgba(30, 64, 175, 0.3);
+
+}
+
+
+
+/* Border gradients */
+
+.theme-border-gradient {
+
+  border: 2px solid transparent;
+
+  background: linear-gradient(var(--theme-background), var(--theme-background)) padding-box,
+
+              linear-gradient(135deg, var(--theme-primary), var(--theme-secondary)) border-box;
+
+}

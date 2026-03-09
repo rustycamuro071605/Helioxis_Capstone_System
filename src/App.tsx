@@ -11,6 +11,9 @@ import NotFound from "./pages/NotFound";
 import GoogleCallbackPage from "./pages/GoogleCallback";
 import { AdminDashboard } from "./admin/AdminDashboard";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { ThemeProvider } from "@/contexts/ThemeContext";
+import { ThemeWrapper } from "@/components/ThemeWrapper";
+import "@/styles/themes.css";
 
 const queryClient = new QueryClient();
 
@@ -34,11 +37,7 @@ const router = createBrowserRouter(
     },
     {
       path: "/",
-      element: (
-        <ProtectedRoute>
-          <Index />
-        </ProtectedRoute>
-      )
+      element: <Index />
     },
     {
       path: "/admin",
@@ -58,11 +57,15 @@ const router = createBrowserRouter(
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <RouterProvider router={router} />
-    </TooltipProvider>
+    <ThemeProvider>
+      <ThemeWrapper>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <RouterProvider router={router} />
+        </TooltipProvider>
+      </ThemeWrapper>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 
